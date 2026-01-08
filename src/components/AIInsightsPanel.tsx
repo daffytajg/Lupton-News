@@ -97,20 +97,20 @@ export default function AIInsightsPanel({
 
   // Sidebar variant (default)
   return (
-    <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-      <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-purple-50">
+    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+      <div className="p-4 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950 dark:to-purple-950">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="text-indigo-600" size={18} />
-            <h3 className="font-semibold text-gray-900">AI Insights</h3>
+            <Sparkles className="text-indigo-600 dark:text-indigo-400" size={18} />
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">AI Insights</h3>
           </div>
-          <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium">
+          <span className="text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full font-medium">
             {insights.length} new
           </span>
         </div>
       </div>
 
-      <div className="divide-y divide-gray-50">
+      <div className="divide-y divide-gray-50 dark:divide-gray-800">
         {insights.slice(0, 4).map((insight) => (
           <InsightCard key={insight.id} insight={insight} sidebar />
         ))}
@@ -118,10 +118,10 @@ export default function AIInsightsPanel({
 
       {predictions && predictions.length > 0 && (
         <>
-          <div className="p-4 border-t border-gray-100 bg-gray-50">
+          <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
             <div className="flex items-center gap-2 mb-3">
-              <Target className="text-purple-600" size={16} />
-              <h4 className="font-medium text-gray-900 text-sm">Predictive Signals</h4>
+              <Target className="text-purple-600 dark:text-purple-400" size={16} />
+              <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">Predictive Signals</h4>
             </div>
             <div className="space-y-2">
               {predictions.slice(0, 2).map((prediction) => (
@@ -134,7 +134,7 @@ export default function AIInsightsPanel({
 
       <Link
         href="/insights"
-        className="block p-3 text-center text-sm font-medium text-indigo-600 hover:bg-indigo-50 transition-colors"
+        className="block p-3 text-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 transition-colors"
       >
         View All Insights →
       </Link>
@@ -204,7 +204,7 @@ function InsightCard({
 
   if (sidebar) {
     return (
-      <div className="p-4 hover:bg-gray-50 transition-colors cursor-pointer">
+      <div className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer">
         <div className="flex items-start gap-3">
           <span className={cn('p-1.5 rounded-lg', config.color)}>
             {config.icon}
@@ -214,27 +214,27 @@ function InsightCard({
               <span className={cn('text-xs font-medium px-1.5 py-0.5 rounded', config.color)}>
                 {config.label}
               </span>
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-400 dark:text-gray-500">
                 {insight.confidence}% confidence
               </span>
             </div>
-            <h4 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2">
+            <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm mb-1 line-clamp-2">
               {insight.title}
             </h4>
-            <p className="text-xs text-gray-500 line-clamp-2">
+            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
               {insight.description}
             </p>
             {sectors.length > 0 && (
               <div className="flex items-center gap-1 mt-2">
                 {sectors.slice(0, 2).map(s => (
-                  <span key={s!.id} className="text-xs text-gray-400">
+                  <span key={s!.id} className="text-xs text-gray-400 dark:text-gray-500">
                     {s!.icon} {s!.shortName}
                   </span>
                 ))}
               </div>
             )}
           </div>
-          <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
+          <ChevronRight size={16} className="text-gray-300 dark:text-gray-600 flex-shrink-0" />
         </div>
       </div>
     );
@@ -379,14 +379,14 @@ function PredictionCard({ prediction }: { prediction: PredictiveSignal }) {
 
 function MiniPredictionCard({ prediction }: { prediction: PredictiveSignal }) {
   return (
-    <div className="bg-white rounded-lg p-2 border border-gray-100">
+    <div className="bg-white dark:bg-gray-900 rounded-lg p-2 border border-gray-100 dark:border-gray-700">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs font-medium text-gray-900 line-clamp-1">
+        <span className="text-xs font-medium text-gray-900 dark:text-gray-100 line-clamp-1">
           {prediction.signal}
         </span>
-        <span className="text-xs font-bold text-purple-600">{prediction.probability}%</span>
+        <span className="text-xs font-bold text-purple-600 dark:text-purple-400">{prediction.probability}%</span>
       </div>
-      <p className="text-xs text-gray-500 line-clamp-1">{prediction.description}</p>
+      <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{prediction.description}</p>
     </div>
   );
 }

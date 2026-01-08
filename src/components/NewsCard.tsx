@@ -16,6 +16,7 @@ import { NewsArticle } from '@/types';
 import { cn, formatDate, getRelevanceColor, getSentimentColor } from '@/lib/utils';
 import { SECTORS, NEWS_CATEGORIES, getCategoryPriorityColor } from '@/data/sectors';
 import { getCompanyById } from '@/data/companies';
+import { getSourceByName } from '@/data/newsSources';
 
 interface NewsCardProps {
   article: NewsArticle;
@@ -31,6 +32,7 @@ export default function NewsCard({
   const relevantSectors = SECTORS.filter(s => article.sectors.includes(s.id));
   const relevantCategories = NEWS_CATEGORIES.filter(c => article.categories.includes(c.id));
   const companies = article.companies.map(id => getCompanyById(id)).filter(Boolean);
+  const sourceInfo = getSourceByName(article.source);
 
   if (variant === 'featured') {
     return (
@@ -65,7 +67,7 @@ export default function NewsCard({
   }
 
   return (
-    <article className="news-card bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md">
+    <article className="news-card bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-md">
       {/* Image */}
       {article.imageUrl && (
         <div className="relative h-40 bg-gray-100">
@@ -176,9 +178,17 @@ export default function NewsCard({
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <div className="flex items-center gap-3 text-xs text-gray-500">
-            <span className="font-medium text-gray-700">{article.source}</span>
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800">
+          <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
+                style={{ backgroundColor: sourceInfo?.color || '#6B7280' }}
+              >
+                {article.source.charAt(0).toUpperCase()}
+              </div>
+              <span className="font-medium text-gray-700 dark:text-gray-300">{article.source}</span>
+            </div>
             <span className="flex items-center gap-1">
               <Clock size={12} />
               {formatDate(article.publishedAt)}
@@ -222,8 +232,10 @@ function FeaturedNewsCard({
   categories: typeof NEWS_CATEGORIES;
   companies: any[];
 }) {
+  const sourceInfo = getSourceByName(article.source);
+
   return (
-    <article className="news-card bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg">
+    <article className="news-card bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-lg">
       <div className="grid md:grid-cols-2 gap-0">
         {/* Image */}
         <div className="relative h-64 md:h-full min-h-[280px] bg-gradient-to-br from-lupton-navy to-lupton-blue">
@@ -333,9 +345,17 @@ function FeaturedNewsCard({
           )}
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-            <div className="flex items-center gap-4 text-sm text-gray-500">
-              <span className="font-medium text-gray-700">{article.source}</span>
+          <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-800">
+            <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                  style={{ backgroundColor: sourceInfo?.color || '#6B7280' }}
+                >
+                  {article.source.charAt(0).toUpperCase()}
+                </div>
+                <span className="font-medium text-gray-700 dark:text-gray-300">{article.source}</span>
+              </div>
               <span className="flex items-center gap-1">
                 <Clock size={14} />
                 {formatDate(article.publishedAt)}
@@ -374,8 +394,10 @@ function CompactNewsCard({
   sectors: typeof SECTORS;
   categories: typeof NEWS_CATEGORIES;
 }) {
+  const sourceInfo = getSourceByName(article.source);
+
   return (
-    <article className="news-card flex items-start gap-3 p-3 bg-white rounded-lg border border-gray-100 hover:shadow-md">
+    <article className="news-card flex items-start gap-3 p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 hover:shadow-md">
       {/* Priority indicator */}
       <div className={cn(
         'w-1 self-stretch rounded-full flex-shrink-0',
@@ -387,10 +409,15 @@ function CompactNewsCard({
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-sm">{categories[0]?.icon}</span>
-          <span className="text-xs text-gray-500">{article.source}</span>
+          <div
+            className="w-4 h-4 rounded-full flex items-center justify-center text-white text-[8px] font-bold flex-shrink-0"
+            style={{ backgroundColor: sourceInfo?.color || '#6B7280' }}
+          >
+            {article.source.charAt(0).toUpperCase()}
+          </div>
+          <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{article.source}</span>
           <span className="text-xs text-gray-400">•</span>
-          <span className="text-xs text-gray-400">{formatDate(article.publishedAt)}</span>
+          <span className="text-xs text-gray-400 dark:text-gray-500">{formatDate(article.publishedAt)}</span>
           {article.isBreaking && (
             <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-medium">
               BREAKING
@@ -435,8 +462,10 @@ function ListNewsCard({
   categories: typeof NEWS_CATEGORIES;
   companies: any[];
 }) {
+  const sourceInfo = getSourceByName(article.source);
+
   return (
-    <article className="news-card bg-white rounded-lg border border-gray-100 p-4 hover:shadow-md">
+    <article className="news-card bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 p-4 hover:shadow-md">
       <div className="flex gap-4">
         {/* Thumbnail */}
         <div className="hidden sm:block w-32 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
@@ -476,9 +505,17 @@ function ListNewsCard({
                 BREAKING
               </span>
             )}
-            <span className="text-xs text-gray-500 ml-auto">
-              {article.source} • {formatDate(article.publishedAt)}
-            </span>
+            <div className="flex items-center gap-2 ml-auto">
+              <div
+                className="w-4 h-4 rounded-full flex items-center justify-center text-white text-[8px] font-bold"
+                style={{ backgroundColor: sourceInfo?.color || '#6B7280' }}
+              >
+                {article.source.charAt(0).toUpperCase()}
+              </div>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {article.source} • {formatDate(article.publishedAt)}
+              </span>
+            </div>
           </div>
 
           {/* Title */}

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MOCK_ALERTS } from '@/data/mockNews';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface HeaderProps {
   onMenuToggle?: () => void;
@@ -100,6 +101,9 @@ export default function Header({ onMenuToggle, isMobileMenuOpen }: HeaderProps) 
               <Sparkles size={16} />
               <span className="text-sm font-medium">AI Insights</span>
             </Link>
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
 
             {/* Notifications */}
             <div className="relative">
