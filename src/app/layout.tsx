@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { Footer } from '@/components/Footer';
+import { AIChatAssistant } from '@/components/AIChatAssistant';
 
 export const metadata: Metadata = {
   title: 'Lupton News Intelligence | OEM & Customer News Alerts',
@@ -14,8 +16,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased">
-        {children}
+      <body className="antialiased min-h-screen flex flex-col">
+        <div className="flex-1">
+          {children}
+        </div>
+        <Footer />
+        <AIChatAssistant />
       </body>
     </html>
   );

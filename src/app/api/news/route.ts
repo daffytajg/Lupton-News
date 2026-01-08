@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { MOCK_NEWS, getFilteredNews, getNewsBySector, getNewsByCompany } from '@/data/mockNews';
+import { fetchAllNews, getNewsBySector, getNewsByCompany, getBreakingNews, refreshNewsCache, getCacheStatus } from '@/lib/googleNews';
 import { calculateRelevanceScore, analyzeSentiment, classifyNewsCategories, isRelevantNews } from '@/lib/ai';
 import { NewsArticle, Sector, NewsCategory } from '@/types';
 
 // API for fetching and filtering news articles
-// In production, this would connect to a real news aggregation service
+// Uses Google News RSS feeds with hourly caching
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -18,14 +18,28 @@ export async function GET(request: NextRequest) {
   const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20;
   const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : 0;
   const sortBy = searchParams.get('sortBy') || 'latest'; // latest, relevance, trending
+  const refresh = searchParams.get('refresh') === 'true';
 
   try {
-    let articles = getFilteredNews({
-      sectors,
-      categories,
-      companies,
-      sentiment,
-    });
+    // Fetch articles (from cache or fresh)
+    let articles = refresh ? await refreshNewsCache() : await fetchAllNews();
+
+    // Apply filters
+    if (sectors && sectors.length > 0) {
+      articles = articles.filter(a => a.sectors.some(s => sectors.includes(s)));
+    }
+
+    if (categories && categories.length > 0) {
+      articles = articles.filter(a => a.categories.some(c => categories.includes(c)));
+    }
+
+    if (companies && companies.length > 0) {
+      articles = articles.filter(a => a.companies.some(c => companies.includes(c)));
+    }
+
+    if (sentiment && sentiment.length > 0) {
+      articles = articles.filter(a => sentiment.includes(a.sentiment));
+    }
 
     // Apply relevance filter
     if (minRelevance) {
@@ -56,6 +70,9 @@ export async function GET(request: NextRequest) {
     const total = articles.length;
     articles = articles.slice(offset, offset + limit);
 
+    // Get cache status
+    const cacheStatus = getCacheStatus();
+
     return NextResponse.json({
       success: true,
       articles,
@@ -64,9 +81,15 @@ export async function GET(request: NextRequest) {
         limit,
         offset,
         hasMore: offset + limit < total,
+        cache: {
+          isCached: cacheStatus.isCached,
+          lastFetched: cacheStatus.lastFetched?.toISOString() || null,
+          expiresAt: cacheStatus.expiresAt?.toISOString() || null,
+        },
       },
     });
   } catch (error) {
+    console.error('News API error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch news' },
       { status: 500 }
@@ -102,7 +125,7 @@ export async function POST(request: NextRequest) {
 
     // Analyze the article
     const categories = classifyNewsCategories(title, summary);
-    const sentiment = analyzeSentiment(title, summary);
+    const sentimentResult = analyzeSentiment(title, summary);
     const relevanceScore = calculateRelevanceScore(title, summary, source, categories);
 
     // Return analysis results
@@ -111,7 +134,7 @@ export async function POST(request: NextRequest) {
       relevant: true,
       analysis: {
         categories,
-        sentiment,
+        sentiment: sentimentResult,
         relevanceScore,
         recommendation: relevanceScore >= 80 ? 'high_priority' :
                        relevanceScore >= 60 ? 'monitor' : 'low_priority',
@@ -122,7 +145,7 @@ export async function POST(request: NextRequest) {
         source,
         url,
         categories,
-        sentiment,
+        sentiment: sentimentResult,
         relevanceScore,
         analyzedAt: new Date().toISOString(),
       },
@@ -135,7 +158,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Endpoint for getting sector-specific news
+// Endpoint for getting sector-specific or company-specific news
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
@@ -149,7 +172,7 @@ export async function PUT(request: NextRequest) {
             { status: 400 }
           );
         }
-        const sectorNews = getNewsBySector(sectorId);
+        const sectorNews = await getNewsBySector(sectorId);
         return NextResponse.json({
           success: true,
           articles: sectorNews,
@@ -163,7 +186,7 @@ export async function PUT(request: NextRequest) {
             { status: 400 }
           );
         }
-        const companyNews = getNewsByCompany(companyId);
+        const companyNews = await getNewsByCompany(companyId);
         return NextResponse.json({
           success: true,
           articles: companyNews,
@@ -171,11 +194,26 @@ export async function PUT(request: NextRequest) {
         });
 
       case 'getBreaking':
-        const breakingNews = MOCK_NEWS.filter((a) => a.isBreaking);
+        const breakingNews = await getBreakingNews();
         return NextResponse.json({
           success: true,
           articles: breakingNews,
           meta: { total: breakingNews.length },
+        });
+
+      case 'refreshCache':
+        const refreshedArticles = await refreshNewsCache();
+        return NextResponse.json({
+          success: true,
+          message: 'Cache refreshed successfully',
+          meta: { total: refreshedArticles.length },
+        });
+
+      case 'getCacheStatus':
+        const status = getCacheStatus();
+        return NextResponse.json({
+          success: true,
+          cache: status,
         });
 
       default:

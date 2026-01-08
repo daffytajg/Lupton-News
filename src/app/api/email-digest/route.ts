@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { MOCK_NEWS, MOCK_AI_INSIGHTS, MOCK_STOCKS } from '@/data/mockNews';
-import { COMPANIES } from '@/data/companies';
+import { fetchAllNews } from '@/lib/googleNews';
+import { generateDailyDigest } from '@/lib/claude';
+import { sendDailyDigest, sendTeamDigests } from '@/lib/email';
+import { COMPANIES, SALES_TEAMS } from '@/data/companies';
 import { SECTORS } from '@/data/sectors';
 
-// This API route generates and could send the daily email digest
-// In production, this would integrate with a service like Resend, SendGrid, or AWS SES
+// API route for generating and sending daily email digests
+// Uses Claude AI for summarization and Resend for delivery
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -12,34 +14,44 @@ export async function GET(request: NextRequest) {
   const preview = searchParams.get('preview') === 'true';
 
   try {
-    // In production, you would fetch user preferences from a database
-    const userPreferences = {
-      followedCompanies: ['nvidia', 'lockheed', 'paccar', 'medtronic', 'fanuc'],
-      followedSectors: ['datacenter', 'military-aerospace'],
-      includeAI: true,
-      includeStocks: true,
-    };
+    // Fetch current news articles
+    const articles = await fetchAllNews();
 
-    // Generate digest content
-    const digest = generateDigest(userPreferences);
+    // Generate AI-curated digest
+    const digest = await generateDailyDigest(articles);
+
+    // Get stats
+    const stats = {
+      totalArticles: articles.length,
+      breakingNews: articles.filter(a => a.isBreaking).length,
+      positiveSentiment: articles.filter(a => a.sentiment === 'positive').length,
+      negativeSentiment: articles.filter(a => a.sentiment === 'negative').length,
+      highPriority: articles.filter(a => a.relevanceScore >= 80).length,
+      sectorCounts: SECTORS.reduce((acc, sector) => {
+        acc[sector.id] = articles.filter(a => a.sectors.includes(sector.id as any)).length;
+        return acc;
+      }, {} as Record<string, number>),
+    };
 
     if (preview) {
       return NextResponse.json({
         success: true,
         preview: true,
         digest,
+        stats,
+        generatedAt: new Date().toISOString(),
       });
     }
-
-    // In production, this would send the email
-    // await sendEmail(digest);
 
     return NextResponse.json({
       success: true,
       message: 'Email digest generated successfully',
       digest,
+      stats,
+      generatedAt: new Date().toISOString(),
     });
   } catch (error) {
+    console.error('Email digest error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to generate email digest' },
       { status: 500 }
@@ -50,153 +62,121 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, recipients, sendNow } = body;
+    const { action, recipients, teamId, userId } = body;
 
-    // Validate request
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, error: 'User ID is required' },
-        { status: 400 }
-      );
+    // Fetch current news articles
+    const articles = await fetchAllNews();
+
+    // Generate AI-curated digest
+    const digest = await generateDailyDigest(articles);
+
+    switch (action) {
+      case 'sendToRecipient': {
+        // Send to a single recipient
+        if (!recipients || !recipients.email) {
+          return NextResponse.json(
+            { success: false, error: 'Recipient email is required' },
+            { status: 400 }
+          );
+        }
+
+        const result = await sendDailyDigest(
+          recipients.email,
+          recipients.name || 'Team Member',
+          digest,
+          articles,
+          teamId
+        );
+
+        return NextResponse.json({
+          success: result.success,
+          message: result.success ? 'Email sent successfully' : 'Failed to send email',
+          messageId: result.messageId,
+          error: result.error,
+          sentAt: new Date().toISOString(),
+        });
+      }
+
+      case 'sendToTeam': {
+        // Send to all members of a sales team
+        if (!teamId) {
+          return NextResponse.json(
+            { success: false, error: 'Team ID is required' },
+            { status: 400 }
+          );
+        }
+
+        const team = SALES_TEAMS.find(t => t.id === teamId);
+        if (!team) {
+          return NextResponse.json(
+            { success: false, error: 'Team not found' },
+            { status: 404 }
+          );
+        }
+
+        // In production, you would fetch team member emails from a database
+        // For now, return a mock response
+        return NextResponse.json({
+          success: true,
+          message: `Digest would be sent to ${team.name}`,
+          team: team.name,
+          customersIncluded: team.assignedCustomers.length,
+          generatedAt: new Date().toISOString(),
+        });
+      }
+
+      case 'sendToAll': {
+        // Send to all configured recipients
+        // This would typically be called by a cron job
+
+        // Mock team email mapping (in production, fetch from database)
+        const teamEmails: Record<string, { email: string; name: string }> = {
+          'team-john-walker': { email: 'jwalker@luptons.com', name: 'John Walker' },
+          'team-jennings-harley': { email: 'jharley@luptons.com', name: 'Jennings Harley' },
+          'team-mike-laney': { email: 'mlaney@luptons.com', name: 'Mike Laney' },
+          'team-chris-dunham': { email: 'cdunham@luptons.com', name: 'Chris Dunham' },
+          'team-greg-johnson': { email: 'gjohnson@luptons.com', name: 'Greg Johnson' },
+          'team-greg-hebert': { email: 'ghebert@luptons.com', name: 'Greg Hebert' },
+          'team-cass-roberts': { email: 'croberts@luptons.com', name: 'Cass Roberts' },
+          'team-cj-roberts': { email: 'cjroberts@luptons.com', name: 'CJ Roberts' },
+          'team-tom-osso': { email: 'tosso@luptons.com', name: 'Tom Osso' },
+          'team-luke-hinkle': { email: 'lhinkle@luptons.com', name: 'Luke Hinkle' },
+          'team-bobby-ramirez': { email: 'bramirez@luptons.com', name: 'Bobby Ramirez' },
+        };
+
+        const results = await sendTeamDigests(digest, articles, teamEmails);
+
+        return NextResponse.json({
+          success: true,
+          message: `Sent ${results.sent} emails, ${results.failed} failed`,
+          results: results.results,
+          sentAt: new Date().toISOString(),
+        });
+      }
+
+      case 'preview': {
+        // Return preview of what would be sent
+        return NextResponse.json({
+          success: true,
+          preview: true,
+          digest,
+          articleCount: articles.length,
+          topStories: digest.topStories,
+          generatedAt: new Date().toISOString(),
+        });
+      }
+
+      default:
+        return NextResponse.json(
+          { success: false, error: 'Invalid action. Use: sendToRecipient, sendToTeam, sendToAll, or preview' },
+          { status: 400 }
+        );
     }
-
-    // In production, this would:
-    // 1. Fetch user preferences
-    // 2. Generate personalized digest
-    // 3. Send email via email service
-
-    const digest = generateDigest({
-      followedCompanies: ['nvidia', 'lockheed', 'paccar'],
-      followedSectors: ['datacenter'],
-      includeAI: true,
-      includeStocks: true,
-    });
-
-    // Mock sending email
-    if (sendNow) {
-      // In production: await sendEmail(digest, recipients);
-      return NextResponse.json({
-        success: true,
-        message: 'Email digest sent successfully',
-        sentTo: recipients || ['alan@luptons.com'],
-        sentAt: new Date().toISOString(),
-      });
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: 'Email digest scheduled',
-      digest,
-    });
   } catch (error) {
+    console.error('Email digest POST error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to send email digest' },
+      { success: false, error: 'Failed to process email digest request' },
       { status: 500 }
     );
   }
-}
-
-interface UserPreferences {
-  followedCompanies: string[];
-  followedSectors: string[];
-  includeAI: boolean;
-  includeStocks: boolean;
-}
-
-function generateDigest(preferences: UserPreferences) {
-  const today = new Date().toISOString().split('T')[0];
-
-  // Get top stories (highest relevance)
-  const topStories = [...MOCK_NEWS]
-    .sort((a, b) => b.relevanceScore - a.relevanceScore)
-    .slice(0, 5)
-    .map((article) => ({
-      id: article.id,
-      title: article.title,
-      summary: article.summary,
-      source: article.source,
-      publishedAt: article.publishedAt,
-      sentiment: article.sentiment,
-      relevanceScore: article.relevanceScore,
-      url: article.url,
-      categories: article.categories,
-      isBreaking: article.isBreaking,
-    }));
-
-  // Get company updates for followed companies
-  const companyUpdates = preferences.followedCompanies.map((companyId) => {
-    const company = COMPANIES.find((c) => c.id === companyId);
-    const articles = MOCK_NEWS.filter((n) => n.companies.includes(companyId));
-    return {
-      company: company ? {
-        id: company.id,
-        name: company.name,
-        ticker: company.ticker,
-        type: company.type,
-      } : null,
-      articleCount: articles.length,
-      articles: articles.slice(0, 3).map((a) => ({
-        id: a.id,
-        title: a.title,
-        sentiment: a.sentiment,
-      })),
-    };
-  }).filter((cu) => cu.company && cu.articleCount > 0);
-
-  // Get sector highlights
-  const sectorHighlights = preferences.followedSectors.map((sectorId) => {
-    const sector = SECTORS.find((s) => s.id === sectorId);
-    const articles = MOCK_NEWS.filter((n) => n.sectors.includes(sectorId as any));
-    return {
-      sector: sector ? {
-        id: sector.id,
-        name: sector.name,
-        icon: sector.icon,
-      } : null,
-      articleCount: articles.length,
-      topArticle: articles[0] ? {
-        id: articles[0].id,
-        title: articles[0].title,
-      } : null,
-    };
-  }).filter((sh) => sh.sector);
-
-  // Get AI insights
-  const aiInsights = preferences.includeAI
-    ? MOCK_AI_INSIGHTS.slice(0, 3).map((insight) => ({
-        id: insight.id,
-        type: insight.type,
-        title: insight.title,
-        description: insight.description,
-        confidence: insight.confidence,
-        impact: insight.impact,
-      }))
-    : [];
-
-  // Get stock movers for followed companies
-  const stockMovers = preferences.includeStocks
-    ? MOCK_STOCKS.filter((s) => Math.abs(s.changePercent) > 1.5).map((stock) => ({
-        ticker: stock.ticker,
-        companyName: stock.companyName,
-        price: stock.price,
-        change: stock.change,
-        changePercent: stock.changePercent,
-      }))
-    : [];
-
-  return {
-    generatedAt: new Date().toISOString(),
-    date: today,
-    summary: {
-      totalArticles: MOCK_NEWS.length,
-      aiInsightsCount: aiInsights.length,
-      companyUpdatesCount: companyUpdates.length,
-      stockMoversCount: stockMovers.length,
-    },
-    topStories,
-    companyUpdates,
-    sectorHighlights,
-    aiInsights,
-    stockMovers,
-  };
 }
