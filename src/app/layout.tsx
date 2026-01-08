@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Footer } from '@/components/Footer';
 import { AIChatAssistant } from '@/components/AIChatAssistant';
+import { StockTicker } from '@/components/StockTicker';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 export const metadata: Metadata = {
   title: 'Lupton News Intelligence | OEM & Customer News Alerts',
@@ -15,13 +17,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="antialiased min-h-screen flex flex-col">
-        <div className="flex-1">
-          {children}
-        </div>
-        <Footer />
-        <AIChatAssistant />
+        <ThemeProvider>
+          <StockTicker />
+          <div className="flex-1">
+            {children}
+          </div>
+          <Footer />
+          <AIChatAssistant />
+        </ThemeProvider>
       </body>
     </html>
   );
