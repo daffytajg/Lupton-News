@@ -57,8 +57,12 @@ export interface Company {
   marketCap?: string;
   employees?: number;
   isActive: boolean;
-  assignedTo?: string[]; // Employee IDs for notification routing
+  assignedTo?: string[]; // Sales team IDs for notification routing
   lastUpdated?: string;
+  // Disambiguation fields to avoid matching wrong companies
+  searchIdentifiers?: string[]; // Alternative names, locations, divisions
+  parentCompany?: string; // Parent company name if subsidiary
+  parentTicker?: string; // Parent company ticker if subsidiary
 }
 
 // News Article
