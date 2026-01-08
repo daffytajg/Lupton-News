@@ -9,7 +9,24 @@ interface ThemeToggleProps {
 }
 
 export function ThemeToggle({ className }: ThemeToggleProps) {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, mounted } = useTheme();
+
+  // Don't render anything until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <button
+        className={cn(
+          'p-2 rounded-lg transition-colors',
+          'hover:bg-gray-100 dark:hover:bg-gray-800',
+          'text-gray-700 dark:text-gray-300',
+          className
+        )}
+        aria-label="Toggle theme"
+      >
+        <Sun className="w-5 h-5" />
+      </button>
+    );
+  }
 
   return (
     <button
