@@ -48,7 +48,7 @@ export default function SectorPage() {
   const sectorStocks = MOCK_STOCKS.filter(s => companyTickers.includes(s.ticker));
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         onMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         isMobileMenuOpen={isMobileMenuOpen}
@@ -106,8 +106,8 @@ export default function SectorPage() {
             <div className="lg:col-span-2 space-y-6">
               {/* Stock Ticker for Sector */}
               {sectorStocks.length > 0 && (
-                <div className="bg-white rounded-xl border border-gray-100 p-4">
-                  <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+                  <h2 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                     <TrendingUp size={18} className="text-lupton-blue" />
                     Sector Stocks
                   </h2>
@@ -115,22 +115,22 @@ export default function SectorPage() {
                     {sectorStocks.map((stock) => (
                       <div
                         key={stock.ticker}
-                        className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer"
+                        className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className="font-bold text-gray-900">{stock.ticker}</span>
+                          <span className="font-bold text-gray-900 dark:text-white">{stock.ticker}</span>
                           <span className={cn(
                             'flex items-center text-sm font-medium',
-                            stock.change >= 0 ? 'text-green-600' : 'text-red-600'
+                            stock.change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                           )}>
                             {stock.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                             {formatPercent(stock.changePercent)}
                           </span>
                         </div>
-                        <div className="text-lg font-semibold text-gray-900">
+                        <div className="text-lg font-semibold text-gray-900 dark:text-white">
                           ${stock.price.toFixed(2)}
                         </div>
-                        <div className="text-xs text-gray-500">{stock.companyName}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{stock.companyName}</div>
                       </div>
                     ))}
                   </div>
@@ -138,9 +138,9 @@ export default function SectorPage() {
               )}
 
               {/* Companies in this Sector */}
-              <div className="bg-white rounded-xl border border-gray-100 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                     <Building2 size={18} className="text-lupton-blue" />
                     Companies in {sector.shortName}
                   </h2>
@@ -156,9 +156,9 @@ export default function SectorPage() {
                     <Link
                       key={company.id}
                       href={`/companies/${company.id}`}
-                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100"
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-100 dark:border-gray-700"
                     >
-                      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+                      <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
                         {company.logo ? (
                           <Image
                             src={company.logo}
@@ -174,11 +174,11 @@ export default function SectorPage() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900 text-sm truncate">
+                        <p className="font-medium text-gray-900 dark:text-white text-sm truncate">
                           {company.name}
                         </p>
                         {company.ticker && (
-                          <p className="text-xs text-gray-500">{company.ticker}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{company.ticker}</p>
                         )}
                       </div>
                       <ExternalLink size={14} className="text-gray-400" />
@@ -190,8 +190,8 @@ export default function SectorPage() {
               {/* News Feed */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-semibold text-gray-900">Latest News</h2>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                  <h2 className="font-semibold text-gray-900 dark:text-white">Latest News</h2>
+                  <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <Filter size={14} />
                     Filter
                   </button>
@@ -204,8 +204,8 @@ export default function SectorPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
-                    <p className="text-gray-500">No news articles found for this sector.</p>
+                  <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-8 text-center">
+                    <p className="text-gray-500 dark:text-gray-400">No news articles found for this sector.</p>
                   </div>
                 )}
               </div>
@@ -222,30 +222,30 @@ export default function SectorPage() {
               )}
 
               {/* Quick Stats */}
-              <div className="bg-white rounded-xl border border-gray-100 p-4">
-                <h3 className="font-semibold text-gray-900 mb-4">Sector Stats</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Sector Stats</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Total Companies</span>
-                    <span className="font-semibold">{companies.length}</span>
+                    <span className="text-gray-600 dark:text-gray-400">Total Companies</span>
+                    <span className="font-semibold dark:text-white">{companies.length}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">News (7 days)</span>
-                    <span className="font-semibold">{news.length}</span>
+                    <span className="text-gray-600 dark:text-gray-400">News (7 days)</span>
+                    <span className="font-semibold dark:text-white">{news.length}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">AI Insights</span>
-                    <span className="font-semibold">{sectorInsights.length}</span>
+                    <span className="text-gray-600 dark:text-gray-400">AI Insights</span>
+                    <span className="font-semibold dark:text-white">{sectorInsights.length}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">OEMs</span>
-                    <span className="font-semibold">
+                    <span className="text-gray-600 dark:text-gray-400">OEMs</span>
+                    <span className="font-semibold dark:text-white">
                       {companies.filter(c => c.type === 'oem').length}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Principals</span>
-                    <span className="font-semibold">
+                    <span className="text-gray-600 dark:text-gray-400">Principals</span>
+                    <span className="font-semibold dark:text-white">
                       {companies.filter(c => c.type === 'principal').length}
                     </span>
                   </div>
@@ -253,19 +253,19 @@ export default function SectorPage() {
               </div>
 
               {/* Other Sectors */}
-              <div className="bg-white rounded-xl border border-gray-100 p-4">
-                <h3 className="font-semibold text-gray-900 mb-4">Other Sectors</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Other Sectors</h3>
                 <div className="space-y-2">
                   {SECTORS.filter(s => s.id !== sectorId).map((s) => (
                     <Link
                       key={s.id}
                       href={`/sectors/${s.id}`}
                       className={cn(
-                        'flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors'
+                        'flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
                       )}
                     >
                       <span className="text-xl">{s.icon}</span>
-                      <span className="text-sm font-medium text-gray-700">{s.name}</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{s.name}</span>
                     </Link>
                   ))}
                 </div>

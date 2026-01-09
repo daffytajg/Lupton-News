@@ -75,20 +75,29 @@ export default function Header({ onMenuToggle, isMobileMenuOpen }: HeaderProps) 
 
           {/* Center - Search */}
           <div className="flex-1 max-w-2xl mx-4 hidden md:block">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Search news, companies, sectors..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-lupton-blue focus:border-transparent transition-all"
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-gray-400">
-                <Sparkles size={14} className="text-lupton-accent" />
-                <span>AI Search</span>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (searchQuery.trim()) {
+                  window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+                }
+              }}
+            >
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Search news, companies, sectors..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-lupton-blue focus:border-transparent transition-all"
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-gray-400">
+                  <Sparkles size={14} className="text-lupton-accent" />
+                  <span>AI Search</span>
+                </div>
               </div>
-            </div>
+            </form>
           </div>
 
           {/* Right section */}
@@ -223,7 +232,7 @@ function NotificationDropdown({
         </div>
         <div className="p-3 bg-gray-50 border-t border-gray-100">
           <Link
-            href="/settings/notifications"
+            href="/settings?tab=notifications"
             className="text-sm text-gray-600 hover:text-lupton-blue"
             onClick={onClose}
           >
@@ -246,21 +255,21 @@ function UserDropdown({ onClose }: { onClose: () => void }) {
         </div>
         <div className="p-2">
           <Link
-            href="/settings/profile"
+            href="/settings?tab=profile"
             className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
             onClick={onClose}
           >
             Profile Settings
           </Link>
           <Link
-            href="/settings/companies"
+            href="/settings?tab=companies"
             className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
             onClick={onClose}
           >
             My Companies
           </Link>
           <Link
-            href="/settings/notifications"
+            href="/settings?tab=notifications"
             className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
             onClick={onClose}
           >

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { SECTORS } from '@/data/sectors';
 import { TrendingUp, TrendingDown, ChevronRight } from 'lucide-react';
@@ -18,7 +19,22 @@ const SECTOR_STATS = [
   { sectorId: 'medical-scientific', articleCount: 29, trend: -1.5, change: 'down' },
 ];
 
+// Generate deterministic sparkline heights based on sector ID
+function generateSparklineHeights(sectorId: string): number[] {
+  const seed = sectorId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return Array.from({ length: 12 }, (_, i) => {
+    // Use a simple seeded random-like formula
+    const value = ((seed * (i + 1) * 13) % 100);
+    return Math.max(20, value);
+  });
+}
+
 export function SectorSidebar({ className }: SectorSidebarProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   return (
     <div className={cn('space-y-3', className)}>
       <div className="flex items-center justify-between mb-4">
@@ -61,19 +77,16 @@ export function SectorSidebar({ className }: SectorSidebarProps) {
 
               {/* Mini sparkline chart */}
               <div className="flex items-end gap-0.5 h-8 mb-2">
-                {Array.from({ length: 12 }).map((_, i) => {
-                  const height = Math.random() * 100;
-                  return (
-                    <div
-                      key={i}
-                      className={cn(
-                        'flex-1 rounded-t transition-all',
-                        stat.change === 'up' ? 'bg-green-500/30 dark:bg-green-500/20' : 'bg-red-500/30 dark:bg-red-500/20'
-                      )}
-                      style={{ height: `${height}%` }}
-                    />
-                  );
-                })}
+                {generateSparklineHeights(sector.id).map((height, i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      'flex-1 rounded-t transition-all',
+                      stat.change === 'up' ? 'bg-green-500/30 dark:bg-green-500/20' : 'bg-red-500/30 dark:bg-red-500/20'
+                    )}
+                    style={{ height: mounted ? `${height}%` : '50%' }}
+                  />
+                ))}
               </div>
 
               {/* Trend indicator */}

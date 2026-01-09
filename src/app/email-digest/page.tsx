@@ -187,13 +187,13 @@ export default function EmailDigestPage() {
                     onToggle={() => toggleSection('companies')}
                   >
                     <div className="space-y-4">
-                      {companyUpdates.slice(0, 3).map(({ company, articles }) => (
-                        <div key={company!.id} className="p-3 bg-gray-50 rounded-lg">
+                      {companyUpdates.slice(0, 3).map(({ company, articles }) => company && (
+                        <div key={company.id} className="p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center gap-2 mb-2">
                             <Building2 size={16} className="text-gray-400" />
-                            <span className="font-medium text-gray-900">{company!.name}</span>
-                            {company!.ticker && (
-                              <span className="text-xs text-gray-500">({company!.ticker})</span>
+                            <span className="font-medium text-gray-900">{company.name}</span>
+                            {company.ticker && (
+                              <span className="text-xs text-gray-500">({company.ticker})</span>
                             )}
                             <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded ml-auto">
                               {articles.length} update{articles.length > 1 ? 's' : ''}
