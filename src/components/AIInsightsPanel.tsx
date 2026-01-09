@@ -315,7 +315,8 @@ function InsightCard({
 }
 
 function PredictionCard({ prediction }: { prediction: PredictiveSignal }) {
-  const companies = prediction.companies.map(id => getCompanyById(id)).filter(Boolean);
+  const companyIds = prediction.companies || prediction.relatedCompanies || [];
+  const companies = companyIds.map(id => getCompanyById(id)).filter(Boolean);
 
   return (
     <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-100 p-4">
@@ -332,23 +333,25 @@ function PredictionCard({ prediction }: { prediction: PredictiveSignal }) {
         </div>
       </div>
 
-      <h3 className="font-semibold text-gray-900 mb-2">{prediction.signal}</h3>
+      <h3 className="font-semibold text-gray-900 mb-2">{prediction.title || prediction.signal}</h3>
       <p className="text-sm text-gray-600 mb-4">{prediction.description}</p>
 
       {/* Indicators */}
-      <div className="mb-4">
-        <p className="text-xs font-medium text-gray-500 mb-2">Key Indicators:</p>
-        <div className="flex flex-wrap gap-2">
-          {prediction.indicators.map((indicator, i) => (
-            <span
-              key={i}
-              className="text-xs bg-white px-2 py-1 rounded border border-purple-100"
-            >
-              {indicator}
-            </span>
-          ))}
+      {prediction.indicators && prediction.indicators.length > 0 && (
+        <div className="mb-4">
+          <p className="text-xs font-medium text-gray-500 mb-2">Key Indicators:</p>
+          <div className="flex flex-wrap gap-2">
+            {prediction.indicators.map((indicator, i) => (
+              <span
+                key={i}
+                className="text-xs bg-white px-2 py-1 rounded border border-purple-100"
+              >
+                {indicator}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Companies */}
       {companies.length > 0 && (

@@ -8,10 +8,9 @@ import {
   TrendingUp,
   TrendingDown,
   Sparkles,
-  Bookmark,
-  Share2,
   MoreHorizontal,
 } from 'lucide-react';
+import { ArticleActions } from '@/components/ArticleActions';
 import { NewsArticle } from '@/types';
 import { cn, formatDate, getRelevanceColor, getSentimentColor } from '@/lib/utils';
 import { SECTORS, NEWS_CATEGORIES, getCategoryPriorityColor } from '@/data/sectors';
@@ -69,21 +68,27 @@ export default function NewsCard({
   return (
     <article className="news-card bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-md">
       {/* Image */}
-      {article.imageUrl && (
-        <div className="relative h-40 bg-gray-100">
+      <div className="relative h-40 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
+        {article.imageUrl && !article.imageUrl.startsWith('/images/') ? (
           <Image
             src={article.imageUrl}
             alt={article.title}
             fill
             className="object-cover"
           />
-          {article.isBreaking && (
-            <div className="absolute top-2 left-2 px-2 py-1 bg-red-600 text-white text-xs font-bold rounded">
-              BREAKING
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-5xl opacity-60">
+              {relevantSectors[0]?.icon || relevantCategories[0]?.icon || '📰'}
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+        {article.isBreaking && (
+          <div className="absolute top-2 left-2 px-2 py-1 bg-red-600 text-white text-xs font-bold rounded">
+            BREAKING
+          </div>
+        )}
+      </div>
 
       {/* Content */}
       <div className="p-4">
@@ -116,7 +121,7 @@ export default function NewsCard({
 
         {/* Title */}
         <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-lupton-blue cursor-pointer">
-          <Link href={article.url} target="_blank">
+          <Link href={article.url.startsWith('/') ? article.url : `/article/${article.id}`}>
             {article.title}
           </Link>
         </h3>
@@ -239,7 +244,7 @@ function FeaturedNewsCard({
       <div className="grid md:grid-cols-2 gap-0">
         {/* Image */}
         <div className="relative h-64 md:h-full min-h-[280px] bg-gradient-to-br from-lupton-navy to-lupton-blue">
-          {article.imageUrl ? (
+          {article.imageUrl && !article.imageUrl.startsWith('/images/') ? (
             <Image
               src={article.imageUrl}
               alt={article.title}
@@ -247,8 +252,11 @@ function FeaturedNewsCard({
               className="object-cover"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-6xl">{categories[0]?.icon || '📰'}</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-lupton-navy via-lupton-blue to-indigo-600">
+              <div className="text-8xl mb-4 opacity-80">{categories[0]?.icon || sectors[0]?.icon || '📰'}</div>
+              <div className="text-white/60 text-sm font-medium uppercase tracking-wider">
+                {sectors[0]?.name || 'Industry News'}
+              </div>
             </div>
           )}
           {article.isBreaking && (
@@ -290,7 +298,7 @@ function FeaturedNewsCard({
 
           {/* Title */}
           <h2 className="text-2xl font-bold text-gray-900 mb-3 hover:text-lupton-blue">
-            <Link href={article.url} target="_blank">
+            <Link href={article.url.startsWith('/') ? article.url : `/article/${article.id}`}>
               {article.title}
             </Link>
           </h2>
@@ -363,15 +371,13 @@ function FeaturedNewsCard({
             </div>
 
             <div className="flex items-center gap-2">
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <Bookmark size={18} className="text-gray-400" />
-              </button>
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <Share2 size={18} className="text-gray-400" />
-              </button>
+              <ArticleActions
+                articleId={article.id}
+                articleTitle={article.title}
+                articleUrl={`/article/${article.id}`}
+              />
               <Link
-                href={article.url}
-                target="_blank"
+                href={`/article/${article.id}`}
                 className="flex items-center gap-1 px-3 py-1.5 bg-lupton-blue text-white text-sm font-medium rounded-lg hover:bg-lupton-navy transition-colors"
               >
                 Read More
@@ -425,7 +431,7 @@ function CompactNewsCard({
           )}
         </div>
         <h4 className="font-medium text-gray-900 text-sm line-clamp-2 hover:text-lupton-blue cursor-pointer">
-          <Link href={article.url} target="_blank">
+          <Link href={article.url.startsWith('/') ? article.url : `/article/${article.id}`}>
             {article.title}
           </Link>
         </h4>
@@ -520,7 +526,7 @@ function ListNewsCard({
 
           {/* Title */}
           <h3 className="font-semibold text-gray-900 mb-1.5 line-clamp-1 hover:text-lupton-blue">
-            <Link href={article.url} target="_blank">
+            <Link href={article.url.startsWith('/') ? article.url : `/article/${article.id}`}>
               {article.title}
             </Link>
           </h3>

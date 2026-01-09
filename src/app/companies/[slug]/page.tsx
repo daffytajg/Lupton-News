@@ -171,7 +171,7 @@ export default function CompanyDetailPage() {
                 <div className="space-y-4">
                   {companyNews.map(article => (
                     <div key={article.id} className="border-b border-gray-100 dark:border-gray-700 pb-4 last:border-0 last:pb-0">
-                      <a href={article.url} target="_blank" rel="noopener noreferrer" className="group">
+                      <Link href={`/article/${article.id}`} className="group">
                         <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
                           {article.title}
                         </h3>
@@ -190,7 +190,7 @@ export default function CompanyDetailPage() {
                             {article.sentiment}
                           </span>
                         </div>
-                      </a>
+                      </Link>
                     </div>
                   ))}
                 </div>

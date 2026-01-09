@@ -255,7 +255,7 @@ export default function CompaniesPage() {
                           stock.change >= 0 ? 'text-green-600' : 'text-red-600'
                         )}>
                           {stock.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                          {formatPercent(stock.changePercent)}
+                          {formatPercent(stock.changePercent ?? stock.change)}
                         </span>
                         <span className="text-xs text-gray-400 ml-auto">{stock.marketCap}</span>
                       </div>
@@ -378,7 +378,7 @@ export default function CompaniesPage() {
                                 'text-xs font-medium',
                                 stock.change >= 0 ? 'text-green-600' : 'text-red-600'
                               )}>
-                                {formatPercent(stock.changePercent)}
+                                {formatPercent(stock.changePercent ?? stock.change)}
                               </span>
                             </div>
                           ) : (

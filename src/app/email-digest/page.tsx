@@ -61,7 +61,7 @@ export default function EmailDigestPage() {
   }).filter((cu) => cu.articles.length > 0);
 
   // Stock movers
-  const stockMovers = MOCK_STOCKS.filter((s) => Math.abs(s.changePercent) > 2);
+  const stockMovers = MOCK_STOCKS.filter((s) => Math.abs(s.changePercent ?? s.change) > 2);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -265,7 +265,7 @@ export default function EmailDigestPage() {
                               stock.change >= 0 ? 'text-green-600' : 'text-red-600'
                             )}>
                               {stock.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                              {formatPercent(stock.changePercent)}
+                              {formatPercent(stock.changePercent ?? stock.change)}
                             </span>
                           </div>
                           <p className="text-xs text-gray-500">{stock.companyName}</p>

@@ -116,7 +116,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   icon={sectorIcons[sector.id]}
                   label={sector.shortName}
                   isActive={pathname === `/sectors/${sector.id}`}
-                  badge={MOCK_DASHBOARD_STATS.sectorBreakdown[sector.id]}
+                  badge={MOCK_DASHBOARD_STATS.sectorBreakdown?.[sector.id]}
                   onClick={onClose}
                 />
               ))}
@@ -132,7 +132,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 icon={<FileText size={18} />}
                 label="Gov Contracts"
                 isActive={pathname === '/categories/government-contracts'}
-                badge={MOCK_DASHBOARD_STATS.categoryBreakdown['government-contracts']}
+                badge={MOCK_DASHBOARD_STATS.categoryBreakdown?.['government-contracts']}
                 badgeColor="bg-red-100 text-red-700"
                 onClick={onClose}
               />
@@ -141,7 +141,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 icon={<TrendingUp size={18} />}
                 label="M&A Activity"
                 isActive={pathname === '/categories/mergers-acquisitions'}
-                badge={MOCK_DASHBOARD_STATS.categoryBreakdown['mergers-acquisitions']}
+                badge={MOCK_DASHBOARD_STATS.categoryBreakdown?.['mergers-acquisitions']}
                 onClick={onClose}
               />
             </div>

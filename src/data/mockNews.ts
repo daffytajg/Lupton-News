@@ -1,13 +1,15 @@
 import { NewsArticle, AIInsight, PredictiveSignal, StockData, Alert, DashboardStats } from '@/types';
 
 // Mock news articles demonstrating the types of news that matter to Lupton Associates
+// URLs point to real news sources or article detail pages
 export const MOCK_NEWS: NewsArticle[] = [
   {
     id: 'news-1',
     title: 'NVIDIA Secures $2.5B Pentagon Contract for AI Defense Systems',
     summary: 'NVIDIA has been awarded a significant Department of Defense contract to develop AI-powered defense systems, marking a major expansion into the military sector.',
-    url: 'https://example.com/nvidia-pentagon',
+    url: '/article/news-1',
     source: 'Defense News',
+    sourceUrl: 'https://www.defensenews.com',
     publishedAt: '2026-01-07T14:30:00Z',
     categories: ['government-contracts'],
     sectors: ['datacenter', 'military-aerospace'],
@@ -16,6 +18,7 @@ export const MOCK_NEWS: NewsArticle[] = [
     sentiment: 'positive',
     isBreaking: true,
     readTime: 4,
+    imageUrl: '/images/articles/nvidia-defense.jpg',
     aiInsights: [
       {
         id: 'insight-1a',
@@ -35,8 +38,9 @@ export const MOCK_NEWS: NewsArticle[] = [
     id: 'news-2',
     title: 'Lockheed Martin to Build $800M Manufacturing Facility in Texas',
     summary: 'Lockheed Martin announces plans for a new advanced manufacturing facility in Fort Worth, Texas, expected to create 2,000 jobs.',
-    url: 'https://example.com/lockheed-texas',
+    url: '/article/news-2',
     source: 'Reuters',
+    sourceUrl: 'https://www.reuters.com',
     publishedAt: '2026-01-07T12:00:00Z',
     categories: ['new-construction', 'expansion'],
     sectors: ['military-aerospace'],
@@ -44,13 +48,15 @@ export const MOCK_NEWS: NewsArticle[] = [
     relevanceScore: 95,
     sentiment: 'positive',
     readTime: 3,
+    imageUrl: '/images/articles/lockheed-facility.jpg',
   },
   {
     id: 'news-3',
     title: 'PACCAR Reports Record Q4 Earnings, Raises 2026 Guidance',
     summary: 'PACCAR exceeded analyst expectations with Q4 revenue of $8.2B, driven by strong demand for Kenworth and Peterbilt trucks.',
-    url: 'https://example.com/paccar-earnings',
+    url: '/article/news-3',
     source: 'Wall Street Journal',
+    sourceUrl: 'https://www.wsj.com',
     publishedAt: '2026-01-07T08:00:00Z',
     categories: ['quarterly-filings', 'stock'],
     sectors: ['heavy-trucks'],
@@ -58,13 +64,15 @@ export const MOCK_NEWS: NewsArticle[] = [
     relevanceScore: 92,
     sentiment: 'positive',
     readTime: 5,
+    imageUrl: '/images/articles/paccar-earnings.jpg',
   },
   {
     id: 'news-4',
     title: 'Medtronic CEO Steps Down; CFO Named Interim Chief',
     summary: 'Medtronic announces departure of CEO Geoffrey Martha, with CFO Karen Parkhill assuming interim leadership role effective immediately.',
-    url: 'https://example.com/medtronic-ceo',
+    url: '/article/news-4',
     source: 'Bloomberg',
+    sourceUrl: 'https://www.bloomberg.com',
     publishedAt: '2026-01-07T07:30:00Z',
     categories: ['c-suite'],
     sectors: ['medical-scientific'],
@@ -73,13 +81,15 @@ export const MOCK_NEWS: NewsArticle[] = [
     sentiment: 'neutral',
     isBreaking: true,
     readTime: 3,
+    imageUrl: '/images/articles/medtronic-ceo.jpg',
   },
   {
     id: 'news-5',
     title: 'Daimler Truck Acquires Electric Powertrain Startup for $450M',
     summary: 'Daimler Truck strengthens its EV portfolio with the acquisition of ElectraDrive Technologies, a leader in heavy-duty electric powertrains.',
-    url: 'https://example.com/daimler-acquisition',
+    url: '/article/news-5',
     source: 'Automotive News',
+    sourceUrl: 'https://www.autonews.com',
     publishedAt: '2026-01-06T16:00:00Z',
     categories: ['mergers-acquisitions'],
     sectors: ['heavy-trucks'],
@@ -87,13 +97,15 @@ export const MOCK_NEWS: NewsArticle[] = [
     relevanceScore: 91,
     sentiment: 'positive',
     readTime: 4,
+    imageUrl: '/images/articles/daimler-ev.jpg',
   },
   {
     id: 'news-6',
     title: 'RTX Awarded $1.2B Army Contract for Next-Gen Missile Systems',
     summary: 'Raytheon receives contract for development and production of advanced missile defense systems for the U.S. Army.',
-    url: 'https://example.com/rtx-army',
+    url: '/article/news-6',
     source: 'Defense One',
+    sourceUrl: 'https://www.defenseone.com',
     publishedAt: '2026-01-06T14:00:00Z',
     categories: ['government-contracts'],
     sectors: ['military-aerospace'],
@@ -101,13 +113,15 @@ export const MOCK_NEWS: NewsArticle[] = [
     relevanceScore: 96,
     sentiment: 'positive',
     readTime: 4,
+    imageUrl: '/images/articles/rtx-missile.jpg',
   },
   {
     id: 'news-7',
     title: 'FANUC Opens New Robotics Assembly Plant in Ohio',
     summary: 'FANUC breaks ground on 500,000 sq ft robotics manufacturing facility in Columbus, Ohio, part of $200M U.S. expansion.',
-    url: 'https://example.com/fanuc-ohio',
+    url: '/article/news-7',
     source: 'Manufacturing Today',
+    sourceUrl: 'https://www.manufacturingtoday.com',
     publishedAt: '2026-01-06T11:00:00Z',
     categories: ['new-construction', 'expansion'],
     sectors: ['robotics-automation'],
@@ -115,13 +129,15 @@ export const MOCK_NEWS: NewsArticle[] = [
     relevanceScore: 89,
     sentiment: 'positive',
     readTime: 3,
+    imageUrl: '/images/articles/fanuc-ohio.jpg',
   },
   {
     id: 'news-8',
     title: 'Thermo Fisher Receives FDA Approval for New Diagnostic Platform',
     summary: 'FDA grants 510(k) clearance for Thermo Fisher\'s next-generation molecular diagnostics system for rapid pathogen detection.',
-    url: 'https://example.com/thermo-fda',
+    url: '/article/news-8',
     source: 'MedTech Dive',
+    sourceUrl: 'https://www.medtechdive.com',
     publishedAt: '2026-01-06T09:30:00Z',
     categories: ['permits', 'product-launch'],
     sectors: ['medical-scientific'],
@@ -129,13 +145,15 @@ export const MOCK_NEWS: NewsArticle[] = [
     relevanceScore: 88,
     sentiment: 'positive',
     readTime: 4,
+    imageUrl: '/images/articles/thermo-fda.jpg',
   },
   {
     id: 'news-9',
     title: 'Intel Announces 3,000 Layoffs as Part of Restructuring',
     summary: 'Intel to reduce workforce by 3,000 employees in Q1 2026 as company continues turnaround efforts under new leadership.',
-    url: 'https://example.com/intel-layoffs',
+    url: '/article/news-9',
     source: 'TechCrunch',
+    sourceUrl: 'https://www.techcrunch.com',
     publishedAt: '2026-01-05T17:00:00Z',
     categories: ['layoffs', 'c-suite'],
     sectors: ['datacenter'],
@@ -143,13 +161,15 @@ export const MOCK_NEWS: NewsArticle[] = [
     relevanceScore: 90,
     sentiment: 'negative',
     readTime: 5,
+    imageUrl: '/images/articles/intel-layoffs.jpg',
   },
   {
     id: 'news-10',
     title: 'Rockwell Automation Partners with Microsoft on Industrial AI',
     summary: 'Strategic partnership will integrate Azure OpenAI into Rockwell\'s FactoryTalk software platform for predictive maintenance.',
-    url: 'https://example.com/rockwell-msft',
+    url: '/article/news-10',
     source: 'Industry Week',
+    sourceUrl: 'https://www.industryweek.com',
     publishedAt: '2026-01-05T14:00:00Z',
     categories: ['partnership'],
     sectors: ['robotics-automation'],
@@ -157,13 +177,15 @@ export const MOCK_NEWS: NewsArticle[] = [
     relevanceScore: 85,
     sentiment: 'positive',
     readTime: 4,
+    imageUrl: '/images/articles/rockwell-msft.jpg',
   },
   {
     id: 'news-11',
     title: 'Vertiv Awarded $180M Data Center Contract in Singapore',
     summary: 'Vertiv to provide cooling infrastructure for major hyperscale data center expansion in Singapore.',
-    url: 'https://example.com/vertiv-singapore',
+    url: '/article/news-11',
     source: 'Data Center Dynamics',
+    sourceUrl: 'https://www.datacenterdynamics.com',
     publishedAt: '2026-01-05T10:00:00Z',
     categories: ['government-contracts', 'expansion'],
     sectors: ['datacenter'],
@@ -171,13 +193,15 @@ export const MOCK_NEWS: NewsArticle[] = [
     relevanceScore: 87,
     sentiment: 'positive',
     readTime: 3,
+    imageUrl: '/images/articles/vertiv-singapore.jpg',
   },
   {
     id: 'news-12',
     title: 'Cummins Receives $95M DOE Grant for Hydrogen Engine Development',
     summary: 'Department of Energy awards Cummins significant funding to accelerate hydrogen-powered heavy-duty engine technology.',
-    url: 'https://example.com/cummins-doe',
+    url: '/article/news-12',
     source: 'Reuters',
+    sourceUrl: 'https://www.reuters.com',
     publishedAt: '2026-01-05T08:00:00Z',
     categories: ['grants'],
     sectors: ['heavy-trucks'],
@@ -185,13 +209,15 @@ export const MOCK_NEWS: NewsArticle[] = [
     relevanceScore: 86,
     sentiment: 'positive',
     readTime: 4,
+    imageUrl: '/images/articles/cummins-hydrogen.jpg',
   },
   {
     id: 'news-13',
     title: 'Boeing Files for New Patent on Autonomous Cargo Aircraft',
     summary: 'Boeing patent application reveals development of autonomous cargo delivery aircraft designed for military and commercial use.',
-    url: 'https://example.com/boeing-patent',
+    url: '/article/news-13',
     source: 'Aviation Week',
+    sourceUrl: 'https://www.aviationweek.com',
     publishedAt: '2026-01-04T15:00:00Z',
     categories: ['permits', 'product-launch'],
     sectors: ['military-aerospace'],
@@ -199,13 +225,15 @@ export const MOCK_NEWS: NewsArticle[] = [
     relevanceScore: 82,
     sentiment: 'positive',
     readTime: 4,
+    imageUrl: '/images/articles/boeing-cargo.jpg',
   },
   {
     id: 'news-14',
     title: 'Intuitive Surgical Stock Surges 8% on Strong Robot Procedure Growth',
     summary: 'Da Vinci surgical robot procedures grew 18% YoY, driving Intuitive Surgical shares to all-time high.',
-    url: 'https://example.com/isrg-stock',
+    url: '/article/news-14',
     source: 'Barron\'s',
+    sourceUrl: 'https://www.barrons.com',
     publishedAt: '2026-01-04T12:00:00Z',
     categories: ['stock', 'quarterly-filings'],
     sectors: ['medical-scientific', 'robotics-automation'],
@@ -213,13 +241,15 @@ export const MOCK_NEWS: NewsArticle[] = [
     relevanceScore: 84,
     sentiment: 'positive',
     readTime: 3,
+    imageUrl: '/images/articles/intuitive-stock.jpg',
   },
   {
     id: 'news-15',
     title: 'New Tariff Regulations Impact Heavy Truck Component Imports',
     summary: 'Biden administration announces new tariff structure affecting truck components from China, impacting supply chains.',
-    url: 'https://example.com/truck-tariffs',
+    url: '/article/news-15',
     source: 'Transport Topics',
+    sourceUrl: 'https://www.ttnews.com',
     publishedAt: '2026-01-04T09:00:00Z',
     categories: ['regulation'],
     sectors: ['heavy-trucks'],
@@ -227,6 +257,7 @@ export const MOCK_NEWS: NewsArticle[] = [
     relevanceScore: 88,
     sentiment: 'negative',
     readTime: 5,
+    imageUrl: '/images/articles/tariff-trucks.jpg',
   },
 ];
 
@@ -267,223 +298,157 @@ export const MOCK_AI_INSIGHTS: AIInsight[] = [
     relatedSectors: ['military-aerospace', 'datacenter'],
     timeframe: '3-6 months',
     impact: 'medium',
-    createdAt: '2026-01-06T14:00:00Z',
-    tags: ['supply-chain', 'semiconductors', 'defense'],
+    createdAt: '2026-01-06T16:00:00Z',
+    tags: ['supply chain', 'semiconductors', 'defense'],
   },
   {
     id: 'ai-4',
     type: 'opportunity',
     title: 'Electric Heavy Truck Infrastructure Build-Out',
-    description: 'Federal infrastructure spending combined with state mandates is creating significant demand for EV charging solutions for commercial fleets.',
+    description: 'Federal infrastructure spending combined with state mandates is creating significant opportunities for charging infrastructure and battery thermal management.',
     confidence: 85,
-    relatedCompanies: ['paccar', 'daimler-truck', 'volvo-trucks', 'cummins'],
+    relatedCompanies: ['paccar', 'daimler-truck', 'cummins'],
     relatedSectors: ['heavy-trucks'],
+    timeframe: '12-18 months',
     impact: 'high',
-    createdAt: '2026-01-06T11:00:00Z',
-    tags: ['EV', 'infrastructure', 'commercial-vehicles'],
+    createdAt: '2026-01-06T12:00:00Z',
+    tags: ['EV', 'infrastructure', 'government'],
   },
   {
     id: 'ai-5',
-    type: 'correlation',
-    title: 'Medical Device Approvals Correlate with Stock Performance',
-    description: 'Historical analysis shows companies receiving FDA approvals see average 12% stock increase within 30 days. Three pending approvals detected for tracked companies.',
+    type: 'trend',
+    title: 'Surgical Robotics Adoption Accelerating in ASCs',
+    description: 'Ambulatory surgery centers are increasingly adopting robotic systems, creating new market opportunities beyond traditional hospital settings.',
     confidence: 88,
-    relatedCompanies: ['medtronic', 'abbott', 'boston-scientific', 'stryker'],
-    relatedSectors: ['medical-scientific'],
+    relatedCompanies: ['intuitive', 'medtronic', 'stryker'],
+    relatedSectors: ['medical-scientific', 'robotics-automation'],
     impact: 'medium',
-    createdAt: '2026-01-05T16:00:00Z',
-    tags: ['FDA', 'stock-performance', 'regulatory'],
+    createdAt: '2026-01-05T14:00:00Z',
+    tags: ['healthcare', 'robotics', 'expansion'],
   },
 ];
 
-// Predictive Signals
-export const MOCK_PREDICTIONS: PredictiveSignal[] = [
+// Predictive Signals for the dashboard
+export const MOCK_PREDICTIVE_SIGNALS: PredictiveSignal[] = [
   {
-    id: 'pred-1',
-    signal: 'NVIDIA Likely to Announce New Data Center Product',
-    description: 'Patent filings, supplier activity, and job postings suggest major product announcement in Q1 2026.',
+    id: 'signal-1',
+    title: 'NVIDIA Likely to Announce New Data Center GPU',
+    description: 'Patent filings, supplier activity, and job postings suggest imminent product launch.',
     probability: 82,
-    companies: ['nvidia'],
-    sectors: ['datacenter'],
-    indicators: ['Patent activity +45%', 'Job postings +30%', 'Supplier orders increased'],
-    recommendedAction: 'Monitor for component specification changes',
-    createdAt: '2026-01-07T12:00:00Z',
+    timeframe: '30 days',
+    relatedCompanies: ['nvidia'],
+    relatedSectors: ['datacenter'],
+    createdAt: '2026-01-07T09:00:00Z',
   },
   {
-    id: 'pred-2',
-    signal: 'Defense Budget Increase Expected',
-    description: 'Congressional activity and geopolitical tensions suggest 8-12% defense budget increase for FY2027.',
+    id: 'signal-2',
+    title: 'Defense Budget Increase Expected',
+    description: 'Congressional activity and geopolitical tensions indicate likely supplemental defense spending.',
     probability: 75,
-    companies: ['lockheed', 'rtx', 'northrop', 'general-dynamics', 'l3harris'],
-    sectors: ['military-aerospace'],
-    indicators: ['Congressional hearings', 'DOD statements', 'Geopolitical analysis'],
-    recommendedAction: 'Prepare for increased defense OEM activity',
-    createdAt: '2026-01-06T09:00:00Z',
+    timeframe: '60 days',
+    relatedCompanies: ['lockheed', 'rtx', 'northrop', 'boeing'],
+    relatedSectors: ['military-aerospace'],
+    createdAt: '2026-01-06T15:00:00Z',
   },
   {
-    id: 'pred-3',
-    signal: 'Potential Acquisition: Cognex Target',
-    description: 'Trading patterns and industry dynamics suggest Cognex may be acquisition target within 12 months.',
-    probability: 45,
-    companies: ['cognex', 'keyence', 'fanuc'],
-    sectors: ['robotics-automation'],
-    indicators: ['Trading volume anomaly', 'Board changes', 'Strategic review rumored'],
-    createdAt: '2026-01-05T15:00:00Z',
+    id: 'signal-3',
+    title: 'Robotics Sector Consolidation Wave',
+    description: 'Multiple indicators suggest 2-3 acquisitions in industrial automation within Q1.',
+    probability: 68,
+    timeframe: '90 days',
+    relatedCompanies: ['fanuc', 'abb', 'rockwell'],
+    relatedSectors: ['robotics-automation'],
+    createdAt: '2026-01-05T11:00:00Z',
   },
 ];
 
-// Mock Stock Data
-export const MOCK_STOCKS: StockData[] = [
-  { ticker: 'NVDA', companyName: 'NVIDIA', price: 875.50, change: 23.40, changePercent: 2.75, volume: 45000000, marketCap: '$2.15T', dayHigh: 880.00, dayLow: 852.30, week52High: 950.00, week52Low: 450.00, lastUpdated: '2026-01-07T16:00:00Z' },
-  { ticker: 'LMT', companyName: 'Lockheed Martin', price: 485.20, change: 8.50, changePercent: 1.78, volume: 2100000, marketCap: '$115B', dayHigh: 488.00, dayLow: 476.50, week52High: 520.00, week52Low: 410.00, lastUpdated: '2026-01-07T16:00:00Z' },
-  { ticker: 'PCAR', companyName: 'PACCAR', price: 112.75, change: 4.25, changePercent: 3.92, volume: 3200000, marketCap: '$58B', dayHigh: 113.50, dayLow: 108.20, week52High: 125.00, week52Low: 85.00, lastUpdated: '2026-01-07T16:00:00Z' },
-  { ticker: 'MDT', companyName: 'Medtronic', price: 88.40, change: -2.15, changePercent: -2.37, volume: 8500000, marketCap: '$118B', dayHigh: 91.00, dayLow: 87.50, week52High: 95.00, week52Low: 72.00, lastUpdated: '2026-01-07T16:00:00Z' },
-  { ticker: 'INTC', companyName: 'Intel', price: 42.80, change: -1.85, changePercent: -4.14, volume: 52000000, marketCap: '$180B', dayHigh: 45.00, dayLow: 42.50, week52High: 55.00, week52Low: 28.00, lastUpdated: '2026-01-07T16:00:00Z' },
-  { ticker: 'ROK', companyName: 'Rockwell Automation', price: 285.60, change: 5.20, changePercent: 1.85, volume: 890000, marketCap: '$32B', dayHigh: 287.00, dayLow: 280.10, week52High: 310.00, week52Low: 240.00, lastUpdated: '2026-01-07T16:00:00Z' },
-  { ticker: 'RTX', companyName: 'RTX Corporation', price: 118.90, change: 3.80, changePercent: 3.30, volume: 5400000, marketCap: '$165B', dayHigh: 119.50, dayLow: 115.00, week52High: 130.00, week52Low: 90.00, lastUpdated: '2026-01-07T16:00:00Z' },
-  { ticker: 'ISRG', companyName: 'Intuitive Surgical', price: 520.00, change: 38.50, changePercent: 8.00, volume: 2800000, marketCap: '$185B', dayHigh: 525.00, dayLow: 482.00, week52High: 530.00, week52Low: 350.00, lastUpdated: '2026-01-07T16:00:00Z' },
+// Stock ticker data with last updated timestamp
+export const MOCK_STOCK_DATA: StockData[] = [
+  { symbol: 'NVDA', price: 875.50, change: 2.75, companyId: 'nvidia', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'LMT', price: 485.20, change: 1.78, companyId: 'lockheed', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'PCAR', price: 112.75, change: 3.92, companyId: 'paccar', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'MDT', price: 88.40, change: -2.37, companyId: 'medtronic', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'RTX', price: 102.33, change: 0.85, companyId: 'rtx', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'TXT', price: 68.42, change: -0.75, companyId: 'textron', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'DE', price: 412.89, change: 0.52, companyId: 'deere', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'NOC', price: 478.33, change: -0.67, companyId: 'northrop', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'LHX', price: 237.45, change: -0.47, companyId: 'l3harris', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'HON', price: 215.68, change: 0.44, companyId: 'honeywell', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'CAT', price: 348.22, change: 1.58, companyId: 'caterpillar', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'EMR', price: 118.34, change: 0.19, companyId: 'emerson', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'PII', price: 76.89, change: -1.13, companyId: 'polaris', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'AGCO', price: 89.56, change: 1.52, companyId: 'agco', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'SNPO', price: 14.23, change: 1.07, companyId: 'snap-on', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'BDX', price: 234.78, change: -0.28, companyId: 'becton-dickinson', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'INTC', price: 42.80, change: -4.14, companyId: 'intel', lastUpdated: '2026-01-09T10:30:00Z' },
+  { symbol: 'RO', price: 285.60, change: 0.92, companyId: 'rockwell', lastUpdated: '2026-01-09T10:30:00Z' },
 ];
 
-// Mock Alerts
+// Alert data
 export const MOCK_ALERTS: Alert[] = [
   {
     id: 'alert-1',
-    type: 'news',
-    title: 'Breaking: NVIDIA Pentagon Contract',
-    message: 'NVIDIA secured $2.5B Pentagon contract for AI defense systems',
+    type: 'breaking',
     priority: 'critical',
-    relatedArticle: 'news-1',
+    title: 'NVIDIA Pentagon Contract Awarded',
+    message: 'Major defense contract signals new market opportunity',
+    relatedArticleId: 'news-1',
     relatedCompanies: ['nvidia'],
-    relatedSectors: ['datacenter', 'military-aerospace'],
     createdAt: '2026-01-07T14:30:00Z',
-    userId: 'user-1',
+    isRead: false,
   },
   {
     id: 'alert-2',
-    type: 'news',
-    title: 'Medtronic CEO Departure',
-    message: 'Medtronic CEO Geoffrey Martha stepping down immediately',
+    type: 'c-suite',
     priority: 'high',
-    relatedArticle: 'news-4',
+    title: 'Medtronic CEO Departure',
+    message: 'Leadership change may impact strategic direction',
+    relatedArticleId: 'news-4',
     relatedCompanies: ['medtronic'],
-    relatedSectors: ['medical-scientific'],
     createdAt: '2026-01-07T07:30:00Z',
-    userId: 'user-1',
+    isRead: false,
   },
   {
     id: 'alert-3',
-    type: 'ai-insight',
-    title: 'AI Prediction: Robotics M&A',
-    message: 'High probability of M&A activity in robotics sector within 6 months',
+    type: 'expansion',
     priority: 'medium',
-    relatedCompanies: ['fanuc', 'abb', 'cognex'],
-    relatedSectors: ['robotics-automation'],
-    createdAt: '2026-01-07T10:00:00Z',
-    userId: 'user-1',
+    title: 'Lockheed Texas Facility',
+    message: 'New manufacturing capacity in your territory',
+    relatedArticleId: 'news-2',
+    relatedCompanies: ['lockheed'],
+    createdAt: '2026-01-07T12:00:00Z',
+    isRead: true,
   },
   {
     id: 'alert-4',
-    type: 'stock',
-    title: 'Stock Alert: INTC -4.14%',
-    message: 'Intel shares down significantly following layoff announcement',
-    priority: 'medium',
-    relatedCompanies: ['intel'],
-    relatedSectors: ['datacenter'],
-    createdAt: '2026-01-07T16:00:00Z',
-    userId: 'user-1',
+    type: 'regulation',
+    priority: 'high',
+    title: 'Truck Tariff Changes',
+    message: 'New tariffs may affect supply chain costs',
+    relatedArticleId: 'news-15',
+    relatedCompanies: ['paccar', 'daimler-truck'],
+    createdAt: '2026-01-04T09:00:00Z',
+    isRead: true,
   },
 ];
 
-// Dashboard Stats
+// Alias for backward compatibility
+export const MOCK_STOCKS = MOCK_STOCK_DATA;
+export const MOCK_PREDICTIONS = MOCK_PREDICTIVE_SIGNALS;
+
+// Helper function to get news by sector
+export function getNewsBySector(sectorId: string) {
+  return MOCK_NEWS.filter(article => article.sectors.includes(sectorId as any));
+}
+
+// Dashboard stats
 export const MOCK_DASHBOARD_STATS: DashboardStats = {
-  totalArticles: 1247,
   articlesToday: 15,
+  totalArticles: 1247,
   activeCompanies: 42,
-  aiInsightsCount: 23,
+  aiInsights: 23,
   criticalAlerts: 2,
-  sectorBreakdown: {
-    'datacenter': 312,
-    'heavy-trucks': 198,
-    'military-aerospace': 287,
-    'robotics-automation': 245,
-    'medical-scientific': 205,
-  },
-  categoryBreakdown: {
-    'government-contracts': 145,
-    'mergers-acquisitions': 89,
-    'quarterly-filings': 234,
-    'c-suite': 67,
-    'new-construction': 98,
-    'permits': 56,
-    'grants': 43,
-    'stock': 187,
-    'expansion': 78,
-    'partnership': 92,
-    'product-launch': 65,
-    'layoffs': 34,
-    'bankruptcy': 12,
-    'regulation': 47,
-  },
-  topCompanies: [
-    { id: 'nvidia', name: 'NVIDIA', articleCount: 89 },
-    { id: 'lockheed', name: 'Lockheed Martin', articleCount: 67 },
-    { id: 'rtx', name: 'RTX Corporation', articleCount: 54 },
-    { id: 'paccar', name: 'PACCAR', articleCount: 48 },
-    { id: 'medtronic', name: 'Medtronic', articleCount: 43 },
-  ],
-  sentimentOverview: {
-    positive: 58,
-    neutral: 30,
-    negative: 12,
-  },
+  articlesChange: 12,
+  insightsChange: 8,
+  lastUpdated: '2026-01-09T10:30:00Z',
 };
-
-// Helper to get news by filters
-export function getFilteredNews(filters: {
-  sectors?: string[];
-  categories?: string[];
-  companies?: string[];
-  sentiment?: string[];
-}): NewsArticle[] {
-  let filtered = [...MOCK_NEWS];
-
-  if (filters.sectors?.length) {
-    filtered = filtered.filter(n =>
-      n.sectors.some(s => filters.sectors!.includes(s))
-    );
-  }
-
-  if (filters.categories?.length) {
-    filtered = filtered.filter(n =>
-      n.categories.some(c => filters.categories!.includes(c))
-    );
-  }
-
-  if (filters.companies?.length) {
-    filtered = filtered.filter(n =>
-      n.companies.some(c => filters.companies!.includes(c))
-    );
-  }
-
-  if (filters.sentiment?.length) {
-    filtered = filtered.filter(n =>
-      filters.sentiment!.includes(n.sentiment)
-    );
-  }
-
-  return filtered.sort((a, b) =>
-    new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-  );
-}
-
-export function getNewsBySector(sector: string): NewsArticle[] {
-  return MOCK_NEWS
-    .filter(n => n.sectors.includes(sector as any))
-    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-}
-
-export function getNewsByCompany(companyId: string): NewsArticle[] {
-  return MOCK_NEWS
-    .filter(n => n.companies.includes(companyId))
-    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-}

@@ -30,7 +30,7 @@ export default function Header({ onMenuToggle, isMobileMenuOpen }: HeaderProps) 
   const unreadAlerts = MOCK_ALERTS.filter(a => !a.readAt).length;
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+    <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
       {/* Top bar with stock ticker */}
       <div className="bg-lupton-navy text-white py-1 overflow-hidden">
         <div className="ticker-animate flex items-center gap-8 whitespace-nowrap">
@@ -166,7 +166,7 @@ function StockTicker({ symbol, price, change }: { symbol: string; price: number;
   const isPositive = change >= 0;
 
   return (
-    <div className="flex items-center gap-2 text-sm">
+    <div className="flex items-center gap-2 text-sm" title={`Last updated: ${new Date().toLocaleTimeString()}`}>
       <span className="font-semibold">{symbol}</span>
       <span>${price.toFixed(2)}</span>
       <span className={cn(

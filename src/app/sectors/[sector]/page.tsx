@@ -40,12 +40,12 @@ export default function SectorPage() {
     i.relatedSectors.includes(sectorId)
   );
   const sectorPredictions = MOCK_PREDICTIONS.filter(p =>
-    p.sectors.includes(sectorId)
+    (p.sectors || p.relatedSectors || []).includes(sectorId)
   );
 
   // Get relevant stocks for this sector
   const companyTickers = companies.map(c => c.ticker).filter(Boolean);
-  const sectorStocks = MOCK_STOCKS.filter(s => companyTickers.includes(s.ticker));
+  const sectorStocks = MOCK_STOCKS.filter(s => companyTickers.includes(s.ticker || s.symbol));
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -124,7 +124,7 @@ export default function SectorPage() {
                             stock.change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                           )}>
                             {stock.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                            {formatPercent(stock.changePercent)}
+                            {formatPercent(stock.changePercent ?? stock.change)}
                           </span>
                         </div>
                         <div className="text-lg font-semibold text-gray-900 dark:text-white">

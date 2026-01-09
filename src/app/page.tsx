@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import { SectorSidebar } from '@/components/SectorSidebar';
 import NewsCard from '@/components/NewsCard';
 import AIInsightsPanel from '@/components/AIInsightsPanel';
+import FilterPanel from '@/components/FilterPanel';
 import StatsCards, {
   SectorBreakdown,
   SentimentOverview,
@@ -13,10 +14,10 @@ import StatsCards, {
 import {
   MOCK_NEWS,
   MOCK_AI_INSIGHTS,
-  MOCK_PREDICTIONS,
+  MOCK_PREDICTIVE_SIGNALS,
   MOCK_DASHBOARD_STATS,
 } from '@/data/mockNews';
-import { NewsArticle } from '@/types';
+import { NewsArticle, NewsFilters } from '@/types';
 import { getGreeting } from '@/lib/utils';
 import {
   Filter,
@@ -26,7 +27,6 @@ import {
   TrendingUp,
   Sparkles,
   RefreshCw,
-  ChevronRight,
   Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -45,15 +45,53 @@ export default function Dashboard() {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [sortBy, setSortBy] = useState<SortBy>('latest');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filters, setFilters] = useState<NewsFilters>({});
 
   const handleRefresh = () => {
     setIsRefreshing(true);
     setTimeout(() => setIsRefreshing(false), 1500);
   };
 
+  // Apply filters to news
+  const filteredNews = useMemo(() => {
+    return MOCK_NEWS.filter(article => {
+      // Filter by sectors
+      if (filters.sectors?.length) {
+        const hasMatchingSector = article.sectors.some(s => filters.sectors?.includes(s));
+        if (!hasMatchingSector) return false;
+      }
+
+      // Filter by categories
+      if (filters.categories?.length) {
+        const hasMatchingCategory = article.categories.some(c => filters.categories?.includes(c));
+        if (!hasMatchingCategory) return false;
+      }
+
+      // Filter by sentiment
+      if (filters.sentiment?.length) {
+        if (!filters.sentiment.includes(article.sentiment)) return false;
+      }
+
+      // Filter by date
+      if (filters.dateFrom) {
+        const articleDate = new Date(article.publishedAt);
+        const filterDate = new Date(filters.dateFrom);
+        if (articleDate < filterDate) return false;
+      }
+
+      // Filter by minimum relevance
+      if (filters.minRelevance && filters.minRelevance > 0) {
+        if (article.relevanceScore < filters.minRelevance) return false;
+      }
+
+      return true;
+    });
+  }, [filters]);
+
   // Get featured article (breaking or highest relevance)
-  const featuredArticle = MOCK_NEWS.find(a => a.isBreaking) || MOCK_NEWS[0];
-  const otherNews = MOCK_NEWS.filter(a => a.id !== featuredArticle.id);
+  const featuredArticle = filteredNews.find(a => a.isBreaking) || filteredNews[0];
+  const otherNews = filteredNews.filter(a => a.id !== featuredArticle?.id);
 
   // Sort news
   const sortedNews = useMemo(() => {
@@ -121,9 +159,27 @@ export default function Dashboard() {
     return groups;
   }, [sortedNews]);
 
+  const getActiveFilterCount = () => {
+    let count = 0;
+    if (filters.sectors?.length) count += filters.sectors.length;
+    if (filters.categories?.length) count += filters.categories.length;
+    if (filters.sentiment?.length) count += filters.sentiment.length;
+    if (filters.dateFrom) count += 1;
+    if (filters.minRelevance && filters.minRelevance > 0) count += 1;
+    return count;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <Header />
+
+      {/* Filter Panel */}
+      <FilterPanel
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        filters={filters}
+        onFiltersChange={setFilters}
+      />
 
       {/* 3-Column Layout */}
       <div className="flex gap-4 p-4 lg:p-6 max-w-[2000px] mx-auto">
@@ -165,14 +221,16 @@ export default function Dashboard() {
           <StatsCards stats={MOCK_DASHBOARD_STATS} />
 
           {/* Your Briefing Section */}
-          <section>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="live-indicator pl-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Your Briefing
-              </span>
-            </div>
-            <NewsCard article={featuredArticle} variant="featured" />
-          </section>
+          {featuredArticle && (
+            <section>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="live-indicator pl-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Your Briefing
+                </span>
+              </div>
+              <NewsCard article={featuredArticle} variant="featured" />
+            </section>
+          )}
 
           {/* News Feed Controls */}
           <div className="flex items-center justify-between flex-wrap gap-3">
@@ -216,9 +274,22 @@ export default function Dashboard() {
             </div>
 
             <div className="flex items-center gap-2">
-              <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">
+              <button 
+                onClick={() => setIsFilterOpen(true)}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors',
+                  getActiveFilterCount() > 0
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                )}
+              >
                 <Filter size={14} />
                 Filter
+                {getActiveFilterCount() > 0 && (
+                  <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded-full text-xs">
+                    {getActiveFilterCount()}
+                  </span>
+                )}
               </button>
               <div className="flex bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
                 <button
@@ -242,6 +313,27 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+
+          {/* Empty State */}
+          {articleGroups.length === 0 && (
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-12 text-center">
+              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Filter className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                No articles match your filters
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">
+                Try adjusting your filter criteria to see more results.
+              </p>
+              <button
+                onClick={() => setFilters({})}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              >
+                Clear All Filters
+              </button>
+            </div>
+          )}
 
           {/* News Feed with Multiple Perspectives */}
           <section className="space-y-4">
@@ -279,11 +371,13 @@ export default function Dashboard() {
           </section>
 
           {/* Load More */}
-          <div className="text-center">
-            <button className="px-6 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm font-medium">
-              Load More Articles
-            </button>
-          </div>
+          {articleGroups.length > 0 && (
+            <div className="text-center">
+              <button className="px-6 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm font-medium">
+                Load More Articles
+              </button>
+            </div>
+          )}
         </main>
 
         {/* Right Sidebar - AI Insights & Stats */}
@@ -292,7 +386,7 @@ export default function Dashboard() {
             {/* AI Insights */}
             <AIInsightsPanel
               insights={MOCK_AI_INSIGHTS}
-              predictions={MOCK_PREDICTIONS}
+              predictions={MOCK_PREDICTIVE_SIGNALS}
             />
 
             {/* Sector Breakdown */}

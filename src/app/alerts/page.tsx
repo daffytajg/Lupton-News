@@ -130,10 +130,10 @@ export default function AlertsPage() {
           <div className="space-y-3">
             {filteredAlerts.length > 0 ? (
               filteredAlerts.map((alert) => {
-                const companies = alert.relatedCompanies
+                const companies = (alert.relatedCompanies || [])
                   .map((id) => getCompanyById(id))
                   .filter(Boolean);
-                const sectors = alert.relatedSectors
+                const sectors = (alert.relatedSectors || [])
                   .map((id) => getSectorById(id))
                   .filter(Boolean);
                 const relatedArticle = alert.relatedArticle

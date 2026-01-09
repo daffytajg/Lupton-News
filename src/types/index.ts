@@ -73,6 +73,7 @@ export interface NewsArticle {
   content?: string;
   url: string;
   source: string;
+  sourceUrl?: string;
   publishedAt: string;
   imageUrl?: string;
   categories: NewsCategory[];
@@ -102,30 +103,36 @@ export interface AIInsight {
 
 export interface PredictiveSignal {
   id: string;
-  signal: string;
+  signal?: string;
+  title?: string;
   description: string;
   probability: number;
-  companies: string[];
-  sectors: Sector[];
-  indicators: string[];
+  timeframe?: string;
+  companies?: string[];
+  relatedCompanies?: string[];
+  sectors?: Sector[];
+  relatedSectors?: Sector[];
+  indicators?: string[];
   recommendedAction?: string;
   createdAt: string;
 }
 
 // Stock/Financial Data
 export interface StockData {
-  ticker: string;
-  companyName: string;
+  symbol?: string;
+  ticker?: string;
+  companyName?: string;
+  companyId?: string;
   price: number;
   change: number;
-  changePercent: number;
-  volume: number;
-  marketCap: string;
-  dayHigh: number;
-  dayLow: number;
-  week52High: number;
-  week52Low: number;
-  lastUpdated: string;
+  changePercent?: number;
+  volume?: number;
+  marketCap?: string;
+  dayHigh?: number;
+  dayLow?: number;
+  week52High?: number;
+  week52Low?: number;
+  lastUpdated?: string;
 }
 
 // User/Employee
@@ -162,16 +169,18 @@ export interface NotificationPreferences {
 // Alert/Notification
 export interface Alert {
   id: string;
-  type: 'news' | 'stock' | 'ai-insight' | 'system';
+  type: 'news' | 'stock' | 'ai-insight' | 'system' | 'breaking' | 'c-suite' | 'expansion' | 'regulation';
   title: string;
   message: string;
   priority: 'critical' | 'high' | 'medium' | 'low';
   relatedArticle?: string;
-  relatedCompanies: string[];
-  relatedSectors: Sector[];
+  relatedArticleId?: string;
+  relatedCompanies?: string[];
+  relatedSectors?: Sector[];
   createdAt: string;
   readAt?: string;
-  userId: string;
+  isRead?: boolean;
+  userId?: string;
 }
 
 // Dashboard Stats
@@ -179,12 +188,16 @@ export interface DashboardStats {
   totalArticles: number;
   articlesToday: number;
   activeCompanies: number;
-  aiInsightsCount: number;
+  aiInsightsCount?: number;
+  aiInsights?: number;
   criticalAlerts: number;
-  sectorBreakdown: Record<Sector, number>;
-  categoryBreakdown: Record<NewsCategory, number>;
-  topCompanies: { id: string; name: string; articleCount: number }[];
-  sentimentOverview: { positive: number; neutral: number; negative: number };
+  articlesChange?: number;
+  insightsChange?: number;
+  lastUpdated?: string;
+  sectorBreakdown?: Record<Sector, number>;
+  categoryBreakdown?: Record<NewsCategory, number>;
+  topCompanies?: { id: string; name: string; articleCount: number }[];
+  sentimentOverview?: { positive: number; neutral: number; negative: number };
 }
 
 // Email Summary

@@ -35,7 +35,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
       />
       <StatCard
         title="AI Insights"
-        value={stats.aiInsightsCount}
+        value={stats.aiInsightsCount ?? stats.aiInsights ?? 0}
         icon={<Sparkles size={20} />}
         color="purple"
         trend={8}
@@ -151,14 +151,15 @@ export function SectorBreakdown({ breakdown }: { breakdown: DashboardStats['sect
     { id: 'medical-scientific', name: 'Medical', color: '#ec4899', icon: '🔬' },
   ];
 
-  const total = Object.values(breakdown).reduce((a, b) => a + b, 0);
+  const safeBreakdown = breakdown || {} as Record<string, number>;
+  const total = Object.values(safeBreakdown).reduce((a, b) => a + b, 0);
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-4">
       <h3 className="font-semibold text-gray-900 mb-4">Sector Breakdown</h3>
       <div className="space-y-3">
         {sectors.map((sector) => {
-          const count = breakdown[sector.id as keyof typeof breakdown] || 0;
+          const count = safeBreakdown[sector.id as keyof typeof safeBreakdown] || 0;
           const percentage = total > 0 ? (count / total) * 100 : 0;
 
           return (
@@ -189,7 +190,8 @@ export function SectorBreakdown({ breakdown }: { breakdown: DashboardStats['sect
 
 // Sentiment overview
 export function SentimentOverview({ sentiment }: { sentiment: DashboardStats['sentimentOverview'] }) {
-  const total = sentiment.positive + sentiment.neutral + sentiment.negative;
+  const safeSentiment = sentiment || { positive: 0, neutral: 0, negative: 0 };
+  const total = safeSentiment.positive + safeSentiment.neutral + safeSentiment.negative || 1;
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-4">
@@ -198,15 +200,15 @@ export function SentimentOverview({ sentiment }: { sentiment: DashboardStats['se
       <div className="flex items-center gap-1 h-4 rounded-full overflow-hidden mb-4">
         <div
           className="h-full bg-green-500"
-          style={{ width: `${(sentiment.positive / total) * 100}%` }}
+          style={{ width: `${(safeSentiment.positive / total) * 100}%` }}
         />
         <div
           className="h-full bg-gray-400"
-          style={{ width: `${(sentiment.neutral / total) * 100}%` }}
+          style={{ width: `${(safeSentiment.neutral / total) * 100}%` }}
         />
         <div
           className="h-full bg-red-500"
-          style={{ width: `${(sentiment.negative / total) * 100}%` }}
+          style={{ width: `${(safeSentiment.negative / total) * 100}%` }}
         />
       </div>
 
@@ -214,21 +216,21 @@ export function SentimentOverview({ sentiment }: { sentiment: DashboardStats['se
         <div className="text-center">
           <div className="flex items-center justify-center gap-1">
             <div className="w-2 h-2 rounded-full bg-green-500" />
-            <span className="text-lg font-bold text-green-600">{sentiment.positive}%</span>
+            <span className="text-lg font-bold text-green-600">{safeSentiment.positive}%</span>
           </div>
           <p className="text-xs text-gray-500">Positive</p>
         </div>
         <div className="text-center">
           <div className="flex items-center justify-center gap-1">
             <div className="w-2 h-2 rounded-full bg-gray-400" />
-            <span className="text-lg font-bold text-gray-600">{sentiment.neutral}%</span>
+            <span className="text-lg font-bold text-gray-600">{safeSentiment.neutral}%</span>
           </div>
           <p className="text-xs text-gray-500">Neutral</p>
         </div>
         <div className="text-center">
           <div className="flex items-center justify-center gap-1">
             <div className="w-2 h-2 rounded-full bg-red-500" />
-            <span className="text-lg font-bold text-red-600">{sentiment.negative}%</span>
+            <span className="text-lg font-bold text-red-600">{safeSentiment.negative}%</span>
           </div>
           <p className="text-xs text-gray-500">Negative</p>
         </div>
@@ -239,11 +241,12 @@ export function SentimentOverview({ sentiment }: { sentiment: DashboardStats['se
 
 // Top Companies widget
 export function TopCompanies({ companies }: { companies: DashboardStats['topCompanies'] }) {
+  const safeCompanies = companies || [];
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-4">
       <h3 className="font-semibold text-gray-900 mb-4">Top Companies</h3>
       <div className="space-y-2">
-        {companies.map((company, index) => (
+        {safeCompanies.map((company, index) => (
           <div
             key={company.id}
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer"
