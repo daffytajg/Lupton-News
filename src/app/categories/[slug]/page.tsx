@@ -72,13 +72,13 @@ export default function CategoryPage() {
     'government-contracts': 'government-contracts',
     'mergers-acquisitions': 'mergers-acquisitions',
     'earnings': 'quarterly-filings',
-    'executive-changes': 'c-suite-changes',
+    'executive-changes': 'c-suite',
     'expansion': 'new-construction',
     'grants': 'grants',
     'product-launch': 'product-launch',
     'partnership': 'partnership',
     'regulatory': 'permits',
-    'supply-chain': 'stock-movement',
+    'supply-chain': 'stock',
   };
 
   const category = categoryMap[slug];

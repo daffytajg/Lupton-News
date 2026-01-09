@@ -93,21 +93,7 @@ export default function SectorsPage() {
                   </span>
                 </div>
               </div>
-              {/* Key OEMs preview */}
-              {sector.keyOEMs && sector.keyOEMs.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1">
-                  {sector.keyOEMs.slice(0, 3).map((oem, i) => (
-                    <span key={i} className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded">
-                      {oem}
-                    </span>
-                  ))}
-                  {sector.keyOEMs.length > 3 && (
-                    <span className="px-2 py-0.5 text-gray-500 text-xs">
-                      +{sector.keyOEMs.length - 3} more
-                    </span>
-                  )}
-                </div>
-              )}
+
             </Link>
           ))}
         </div>

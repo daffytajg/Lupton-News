@@ -1,0 +1,380 @@
+// Lupton News Intelligence Platform - Database Schema
+// Comprehensive schema for users, companies, news, alerts, and AI insights
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// USER & AUTHENTICATION
+// ==========================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  password      String?
+  image         String?
+  role          String    @default("SALES")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  teamId        String?
+  team          Team?     @relation(fields: [teamId], references: [id])
+  preferences   UserPreferences?
+  alerts        Alert[]
+  savedArticles SavedArticle[]
+  readArticles  ReadArticle[]
+  sessions      Session[]
+  accounts      Account[]
+  assignedCompanies UserCompanyAssignment[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  
+  @@unique([identifier, token])
+}
+
+model UserPreferences {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  emailEnabled          Boolean  @default(true)
+  emailFrequency        String   @default("daily")
+  emailTime             String   @default("07:00")
+  minRelevanceScore     Int      @default(60)
+  
+  pushEnabled           Boolean  @default(true)
+  pushBreakingOnly      Boolean  @default(false)
+  
+  alertPriorityThreshold String  @default("high")
+  followedSectors       String   @default("[]")
+  notificationCategories String  @default("[]")
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  members     User[]
+}
+
+// ==========================================
+// COMPANIES & ASSIGNMENTS
+// ==========================================
+
+model Company {
+  id                String   @id @default(cuid())
+  externalId        String   @unique
+  name              String
+  shortName         String?
+  type              String   @default("CUSTOMER")
+  website           String?
+  stockTicker       String?
+  stockExchange     String?
+  headquarters      String?
+  description       String?
+  searchIdentifiers String   @default("[]")
+  parentCompanyId   String?
+  parentCompany     Company? @relation("CompanyHierarchy", fields: [parentCompanyId], references: [id])
+  subsidiaries      Company[] @relation("CompanyHierarchy")
+  sectors           String   @default("[]")
+  keyContacts       String   @default("[]")
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  userAssignments   UserCompanyAssignment[]
+  newsArticles      ArticleCompany[]
+  alerts            Alert[]
+  aiInsights        AIInsightCompany[]
+}
+
+model UserCompanyAssignment {
+  id          String   @id @default(cuid())
+  userId      String
+  companyId   String
+  isPrimary   Boolean  @default(false)
+  assignedAt  DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, companyId])
+}
+
+// ==========================================
+// NEWS ARTICLES
+// ==========================================
+
+model NewsArticle {
+  id              String   @id @default(cuid())
+  externalId      String?  @unique
+  title           String
+  summary         String?
+  content         String?
+  url             String
+  source          String
+  sourceType      String?
+  imageUrl        String?
+  publishedAt     DateTime
+  fetchedAt       DateTime @default(now())
+  
+  relevanceScore  Int      @default(0)
+  sentiment       String?
+  sentimentScore  Float?
+  isBreaking      Boolean  @default(false)
+  readTime        Int?
+  
+  categories      String   @default("[]")
+  sectors         String   @default("[]")
+  
+  aiSummary       String?
+  aiAnalysis      String?
+  aiActionItems   String?
+  
+  processed       Boolean  @default(false)
+  processedAt     DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  companies       ArticleCompany[]
+  alerts          Alert[]
+  savedBy         SavedArticle[]
+  readBy          ReadArticle[]
+  insights        AIInsight[]
+}
+
+model ArticleCompany {
+  id          String      @id @default(cuid())
+  articleId   String
+  companyId   String
+  isPrimary   Boolean     @default(false)
+  confidence  Float       @default(1.0)
+  
+  article     NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  @@unique([articleId, companyId])
+}
+
+model SavedArticle {
+  id        String      @id @default(cuid())
+  userId    String
+  articleId String
+  savedAt   DateTime    @default(now())
+  notes     String?
+  
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, articleId])
+}
+
+model ReadArticle {
+  id        String      @id @default(cuid())
+  userId    String
+  articleId String
+  readAt    DateTime    @default(now())
+  
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, articleId])
+}
+
+// ==========================================
+// ALERTS & NOTIFICATIONS
+// ==========================================
+
+model Alert {
+  id              String    @id @default(cuid())
+  userId          String
+  type            String    @default("NEWS")
+  priority        String    @default("MEDIUM")
+  title           String
+  message         String
+  
+  articleId       String?
+  companyId       String?
+  insightId       String?
+  
+  readAt          DateTime?
+  dismissedAt     DateTime?
+  actionTaken     String?
+  
+  emailSentAt     DateTime?
+  pushSentAt      DateTime?
+  
+  createdAt       DateTime  @default(now())
+  
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article         NewsArticle? @relation(fields: [articleId], references: [id])
+  company         Company?    @relation(fields: [companyId], references: [id])
+  insight         AIInsight?  @relation(fields: [insightId], references: [id])
+}
+
+// ==========================================
+// AI INSIGHTS & PREDICTIONS
+// ==========================================
+
+model AIInsight {
+  id              String      @id @default(cuid())
+  type            String      @default("TREND")
+  title           String
+  description     String
+  confidence      Int
+  impact          String
+  timeframe       String?
+  
+  relatedSectors  String      @default("[]")
+  tags            String      @default("[]")
+  
+  sourceArticleId String?
+  sourceArticle   NewsArticle? @relation(fields: [sourceArticleId], references: [id])
+  
+  isActive        Boolean     @default(true)
+  dismissedCount  Int         @default(0)
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  expiresAt       DateTime?
+  
+  companies       AIInsightCompany[]
+  alerts          Alert[]
+}
+
+model AIInsightCompany {
+  id          String    @id @default(cuid())
+  insightId   String
+  companyId   String
+  
+  insight     AIInsight @relation(fields: [insightId], references: [id], onDelete: Cascade)
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  @@unique([insightId, companyId])
+}
+
+// ==========================================
+// EMAIL DIGEST TRACKING
+// ==========================================
+
+model EmailDigest {
+  id            String   @id @default(cuid())
+  userId        String
+  type          String
+  sentAt        DateTime @default(now())
+  articleIds    String   @default("[]")
+  subject       String
+  htmlContent   String?
+  delivered     Boolean  @default(false)
+  openedAt      DateTime?
+  clickedAt     DateTime?
+  createdAt     DateTime @default(now())
+}
+
+// ==========================================
+// INDUSTRY & SECTOR TRACKING
+// ==========================================
+
+model SectorUpdate {
+  id            String   @id @default(cuid())
+  sectorId      String
+  title         String
+  summary       String
+  type          String
+  impact        String
+  aiAnalysis    String?
+  opportunities String?
+  risks         String?
+  publishedAt   DateTime
+  createdAt     DateTime @default(now())
+}
+
+// ==========================================
+// GOVERNMENT & POLICY TRACKING
+// ==========================================
+
+model PolicyUpdate {
+  id              String   @id @default(cuid())
+  title           String
+  summary         String
+  source          String
+  url             String?
+  type            String
+  agency          String?
+  affectedSectors String   @default("[]")
+  affectedCompanies String @default("[]")
+  impactLevel     String
+  aiAnalysis      String?
+  actionItems     String?
+  effectiveDate   DateTime?
+  publishedAt     DateTime
+  createdAt       DateTime @default(now())
+}
+
+// ==========================================
+// LEAD GENERATION & PROSPECTS
+// ==========================================
+
+model ProspectLead {
+  id              String   @id @default(cuid())
+  companyName     String
+  website         String?
+  sourceType      String
+  sourceArticleId String?
+  sector          String
+  territory       String?
+  estimatedValue  String?
+  aiRationale     String?
+  suggestedApproach String?
+  assignedUserId  String?
+  assignedAt      DateTime?
+  status          String   @default("new")
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

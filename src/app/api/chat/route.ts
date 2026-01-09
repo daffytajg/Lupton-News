@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch recent news for context
-    let articles = [];
+    let articles: any[] = [];
     try {
       articles = await fetchAllNews();
     } catch (error) {

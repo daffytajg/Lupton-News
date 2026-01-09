@@ -190,7 +190,7 @@ function rssItemToNewsArticle(item: RSSItem, index: number): NewsArticle | null 
   const companyIds = mentionedCompanies.map(c => c.id);
 
   // Determine sectors based on mentioned companies
-  const sectors = [...new Set(mentionedCompanies.flatMap(c => c.sectors))] as Sector[];
+  const sectors = Array.from(new Set(mentionedCompanies.flatMap(c => c.sectors))) as Sector[];
 
   // Classify categories
   const categories = classifyNewsCategories(title, description);
@@ -225,7 +225,6 @@ function rssItemToNewsArticle(item: RSSItem, index: number): NewsArticle | null 
     sentiment,
     relevanceScore: hasPriorityKeyword ? Math.min(relevanceScore + 10, 100) : relevanceScore,
     isBreaking,
-    aiSummary: undefined, // Will be filled by AI summarization
   };
 }
 
