@@ -31,7 +31,10 @@ export type NewsCategory =
   | 'layoffs'
   | 'bankruptcy'
   | 'partnership'
-  | 'regulation';
+  | 'regulation'
+  | 'earnings'
+  | 'executive-moves'
+  | 'capex';
 
 export interface NewsCategoryInfo {
   id: NewsCategory;
@@ -96,9 +99,10 @@ export interface AIInsight {
   relatedCompanies: string[];
   relatedSectors: Sector[];
   timeframe?: string;
-  impact: 'high' | 'medium' | 'low';
+  impact?: 'high' | 'medium' | 'low';
   createdAt: string;
-  tags: string[];
+  tags?: string[];
+  actionItems?: string[];
 }
 
 export interface PredictiveSignal {

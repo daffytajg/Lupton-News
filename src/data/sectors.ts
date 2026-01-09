@@ -351,6 +351,36 @@ export const RELEVANT_KEYWORDS: Record<NewsCategory, string[]> = {
     'trade policy',
     'sanction',
   ],
+  earnings: [
+    'earnings',
+    'quarterly results',
+    'revenue beat',
+    'earnings beat',
+    'profit',
+    'EPS',
+    'earnings per share',
+    'financial results',
+    'quarterly report',
+  ],
+  'executive-moves': [
+    'CEO appointed',
+    'CEO resigned',
+    'executive hire',
+    'leadership change',
+    'new CEO',
+    'steps down',
+    'executive departure',
+    'board appointment',
+  ],
+  capex: [
+    'capital expenditure',
+    'capex',
+    'investment',
+    'facility investment',
+    'equipment purchase',
+    'infrastructure investment',
+    'capital spending',
+  ],
 };
 
 export function getSectorById(id: Sector): SectorInfo | undefined {

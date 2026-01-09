@@ -256,14 +256,16 @@ function InsightCard({
             <span className={cn('text-xs font-medium px-2 py-0.5 rounded', config.color)}>
               {config.label}
             </span>
-            <span className={cn(
-              'ml-2 text-xs font-medium px-2 py-0.5 rounded',
-              insight.impact === 'high' ? 'bg-red-100 text-red-700' :
-              insight.impact === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-              'bg-gray-100 text-gray-700'
-            )}>
-              {insight.impact.toUpperCase()} IMPACT
-            </span>
+            {insight.impact && (
+              <span className={cn(
+                'ml-2 text-xs font-medium px-2 py-0.5 rounded',
+                insight.impact === 'high' ? 'bg-red-100 text-red-700' :
+                insight.impact === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                'bg-gray-100 text-gray-700'
+              )}>
+                {insight.impact.toUpperCase()} IMPACT
+              </span>
+            )}
           </div>
         </div>
         <div className="text-right">
@@ -305,11 +307,13 @@ function InsightCard({
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-1">
-        {insight.tags.map(tag => (
-          <span key={tag} className="text-xs text-gray-400">#{tag}</span>
-        ))}
-      </div>
+      {insight.tags && insight.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {insight.tags.map(tag => (
+            <span key={tag} className="text-xs text-gray-400">#{tag}</span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
