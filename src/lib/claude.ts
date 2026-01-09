@@ -312,23 +312,163 @@ The datacenter sector is showing strong momentum with several key developments:
 **Pipeline Value:** High - multiple large-scale projects in motion`;
   }
 
-  return `I'm your Lupton News AI Assistant, ready to help you stay informed about customers and industry trends.
+  // Handle M&A queries
+  if (lowerQuery.includes('m&a') || lowerQuery.includes('merger') || lowerQuery.includes('acquisition')) {
+    return `**M&A Activity Update:**
 
-**I can help you with:**
-• Sector analysis (datacenter, defense, trucks, robotics, medical)
-• Company-specific news and insights
-• Risk alerts and opportunities
-• Trend predictions and forecasts
-• Daily news summaries
+**Recent Transactions:**
+• Robotics sector consolidation expected - 2-3 acquisitions predicted in Q1
+• Defense industry seeing increased private equity interest
+• Medical device companies actively pursuing bolt-on acquisitions
 
-**Try asking:**
-• "What's happening in the datacenter sector?"
+**Companies to Watch:**
+• FANUC - potential acquirer in automation space
+• Rockwell Automation - strategic acquisition candidate
+• Smaller surgical robotics firms - consolidation targets
+
+**Implications for Lupton:**
+• M&A activity often creates new procurement opportunities
+• Integration periods = chance to establish new relationships
+• Watch for leadership changes post-acquisition
+
+**Probability:** 68% chance of major robotics sector deal within 90 days`;
+  }
+
+  // Handle company-specific queries
+  if (lowerQuery.includes('nvidia') || lowerQuery.includes('nvda')) {
+    return `**NVIDIA (NVDA) Analysis:**
+
+**Stock:** $875.50 (+2.75%)
+
+**Recent News:**
+• $2.5B Pentagon contract for AI defense systems - BREAKING
+• Continued dominance in AI/GPU market
+• Datacenter revenue growth exceeding expectations
+
+**Lupton Relevance:**
+• Defense applications creating new component needs
+• GPU cooling solutions in high demand
+• Power management for AI clusters
+
+**Action Items:**
+• Defense team should explore AI system component opportunities
+• Datacenter team monitor for facility expansion announcements`;
+  }
+
+  if (lowerQuery.includes('lockheed') || lowerQuery.includes('lmt')) {
+    return `**Lockheed Martin (LMT) Analysis:**
+
+**Stock:** $485.20 (+1.78%)
+
+**Recent News:**
+• $800M manufacturing facility announced in Fort Worth, Texas
+• Expected to create 2,000 jobs
+• Advanced manufacturing capabilities expansion
+
+**Lupton Relevance:**
+• New facility = significant equipment opportunities
+• Automation and tooling needs
+• Long-term supply chain partnerships
+
+**Action Items:**
+• Contact facility planning team for RFQ opportunities
+• Position for automation equipment needs`;
+  }
+
+  if (lowerQuery.includes('paccar') || lowerQuery.includes('pcar') || lowerQuery.includes('kenworth') || lowerQuery.includes('peterbilt')) {
+    return `**PACCAR (PCAR) Analysis:**
+
+**Stock:** $112.75 (+3.92%) - Strong performer
+
+**Recent News:**
+• Record Q4 revenue of $8.2B
+• Strong Kenworth and Peterbilt demand
+• Raised 2026 guidance
+
+**Lupton Relevance:**
+• Strong financials = continued procurement
+• EV transition creating new component needs
+• Fleet modernization driving demand
+
+**Action Items:**
+• Heavy trucks team should capitalize on strong demand
+• Explore EV-related component opportunities`;
+  }
+
+  if (lowerQuery.includes('medtronic') || lowerQuery.includes('mdt')) {
+    return `**Medtronic (MDT) Analysis:**
+
+**Stock:** $88.40 (-2.37%) - Under pressure
+
+**Recent News:**
+• CEO Geoffrey Martha stepping down
+• CFO Karen Parkhill named interim chief
+• Leadership transition creating uncertainty
+
+**Lupton Relevance:**
+• Monitor for strategy changes
+• Procurement decisions may be delayed
+• New leadership = opportunity to establish relationships
+
+**Action Items:**
+• Medical team should schedule check-in with contacts
+• Watch for organizational changes affecting procurement`;
+  }
+
+  // Handle general questions
+  if (lowerQuery.includes('help') || lowerQuery.includes('what can you')) {
+    return `**I'm your Lupton News AI Assistant!**
+
+I help you stay informed about customers, principals, and industry trends. Here's what I can do:
+
+**Sector Analysis:**
+• Datacenter & Computing
+• Heavy Trucks & Transportation
+• Military & Aerospace
+• Robotics & Automation
+• Medical & Scientific
+
+**News Intelligence:**
+• Daily summaries and breaking news
+• Company-specific updates
+• M&A activity tracking
+• Government contracts
+
+**Alerts & Risks:**
+• Critical business alerts
+• Risk monitoring
+• Opportunity identification
+
+**Try asking me:**
+• "What's happening with our defense customers?"
 • "Summarize today's top stories"
-• "Show me defense industry trends"
-• "What are the current risk alerts?"
-• "What opportunities should we pursue?"
+• "Any M&A activity this week?"
+• "Show risks for the datacenter sector"
+• "Tell me about NVIDIA"
+• "What opportunities should we pursue?"`;
+  }
 
-What would you like to know?`;
+  // Default response - more helpful and contextual
+  return `Based on your question, here's what I found:
+
+**Current Market Overview:**
+• **Datacenter:** Strong momentum driven by AI infrastructure buildout
+• **Defense:** Stable with increased government spending
+• **Heavy Trucks:** PACCAR showing record performance
+• **Robotics:** Consolidation expected in Q1
+• **Medical:** Leadership transitions creating uncertainty
+
+**Top Stories Today:**
+1. NVIDIA $2.5B Pentagon AI contract
+2. Lockheed Martin $800M Texas facility
+3. PACCAR record Q4 earnings
+4. Medtronic CEO transition
+
+**How can I help further?**
+Ask me about specific sectors, companies, trends, risks, or opportunities. For example:
+• "Tell me more about the NVIDIA contract"
+• "What's happening in robotics?"
+• "Show me current risk alerts"`;
 }
 
 /**

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -60,15 +61,21 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="flex flex-col h-full overflow-hidden">
           {/* Logo for mobile */}
           <div className="lg:hidden p-4 border-b border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl gradient-navy flex items-center justify-center">
-                <span className="text-white font-bold text-lg">L</span>
+            <Link href="/" className="flex items-center gap-3" onClick={onClose}>
+              <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#1a1a1a] flex items-center justify-center">
+                <Image
+                  src="/lupton-logo.png"
+                  alt="Lupton Associates"
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                />
               </div>
               <div>
                 <h1 className="font-bold text-lg text-lupton-navy">Lupton News</h1>
                 <p className="text-xs text-gray-500">Intelligence Platform</p>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* Navigation */}
@@ -89,7 +96,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 href="/companies"
                 icon={<Building2 size={18} />}
                 label="Companies"
-                isActive={pathname === '/companies'}
+                isActive={pathname === '/companies' || pathname?.startsWith('/companies/')}
                 badge={MOCK_DASHBOARD_STATS.activeCompanies}
                 onClick={onClose}
               />

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Search,
   Bell,
@@ -63,8 +64,15 @@ export default function Header({ onMenuToggle, isMobileMenuOpen }: HeaderProps) 
             </button>
 
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl gradient-navy flex items-center justify-center">
-                <span className="text-white font-bold text-lg">L</span>
+              <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center bg-[#1a1a1a]">
+                <Image
+                  src="/lupton-logo.png"
+                  alt="Lupton Associates"
+                  width={48}
+                  height={48}
+                  className="object-contain"
+                  priority
+                />
               </div>
               <div className="hidden sm:block">
                 <h1 className="font-bold text-xl text-lupton-navy">Lupton News</h1>
@@ -203,10 +211,12 @@ function NotificationDropdown({
         </div>
         <div className="max-h-96 overflow-y-auto">
           {alerts.slice(0, 5).map((alert) => (
-            <div
+            <Link
               key={alert.id}
+              href="/alerts"
+              onClick={onClose}
               className={cn(
-                'p-4 border-b border-gray-50 hover:bg-gray-50 cursor-pointer',
+                'block p-4 border-b border-gray-50 hover:bg-gray-50 cursor-pointer',
                 !alert.readAt && 'bg-blue-50/50'
               )}
             >
@@ -227,12 +237,12 @@ function NotificationDropdown({
                   </p>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
         <div className="p-3 bg-gray-50 border-t border-gray-100">
           <Link
-            href="/settings?tab=notifications"
+            href="/settings"
             className="text-sm text-gray-600 hover:text-lupton-blue"
             onClick={onClose}
           >
@@ -255,21 +265,21 @@ function UserDropdown({ onClose }: { onClose: () => void }) {
         </div>
         <div className="p-2">
           <Link
-            href="/settings?tab=profile"
+            href="/settings"
             className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
             onClick={onClose}
           >
             Profile Settings
           </Link>
           <Link
-            href="/settings?tab=companies"
+            href="/companies"
             className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
             onClick={onClose}
           >
             My Companies
           </Link>
           <Link
-            href="/settings?tab=notifications"
+            href="/settings"
             className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
             onClick={onClose}
           >
