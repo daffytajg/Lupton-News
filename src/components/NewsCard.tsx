@@ -68,21 +68,26 @@ export default function NewsCard({
   return (
     <article className="news-card bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-md">
       {/* Image */}
-      <div className="relative h-40 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
+      <div className="relative h-40 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900">
         {article.imageUrl && !article.imageUrl.startsWith('/images/') ? (
           <Image
             src={article.imageUrl}
             alt={article.title}
             fill
             className="object-cover"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
           />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-5xl opacity-60">
-              {relevantSectors[0]?.icon || relevantCategories[0]?.icon || '📰'}
-            </div>
+        ) : null}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <div className="text-5xl mb-2">
+            {relevantSectors[0]?.icon || relevantCategories[0]?.icon || '📰'}
           </div>
-        )}
+          <div className="text-white/50 text-xs font-medium uppercase tracking-wider">
+            {relevantSectors[0]?.shortName || 'News'}
+          </div>
+        </div>
         {article.isBreaking && (
           <div className="absolute top-2 left-2 px-2 py-1 bg-red-600 text-white text-xs font-bold rounded">
             BREAKING

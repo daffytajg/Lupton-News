@@ -247,19 +247,26 @@ export default function CompaniesPage() {
                     </div>
 
                     {/* Stock info */}
-                    {stock && (
-                      <div className="flex items-center gap-2 mb-3 p-2 bg-gray-50 rounded-lg">
-                        <span className="font-semibold text-gray-900">${stock.price.toFixed(2)}</span>
-                        <span className={cn(
-                          'flex items-center text-sm font-medium',
-                          stock.change >= 0 ? 'text-green-600' : 'text-red-600'
-                        )}>
-                          {stock.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                          {formatPercent(stock.changePercent ?? stock.change)}
-                        </span>
-                        <span className="text-xs text-gray-400 ml-auto">{stock.marketCap}</span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-2 mb-3 p-2 bg-gray-50 rounded-lg">
+                      {stock ? (
+                        <>
+                          <span className="font-semibold text-gray-900">${stock.price.toFixed(2)}</span>
+                          <span className={cn(
+                            'flex items-center text-sm font-medium',
+                            stock.change >= 0 ? 'text-green-600' : 'text-red-600'
+                          )}>
+                            {stock.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                            {formatPercent(stock.changePercent ?? stock.change)}
+                          </span>
+                          <span className="text-xs text-gray-400 ml-auto">{stock.marketCap}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-sm text-gray-400">Private Company</span>
+                          <span className="text-xs text-gray-300 ml-auto">Stock N/A</span>
+                        </>
+                      )}
+                    </div>
 
                     {/* Sectors */}
                     <div className="flex flex-wrap gap-1 mb-3">

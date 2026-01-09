@@ -70,9 +70,9 @@ export default function SectorPage() {
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <span className="text-4xl">{sector.icon}</span>
-                  <h1 className="text-3xl font-bold">{sector.name}</h1>
+                  <h1 className="text-3xl font-bold text-white drop-shadow-lg">{sector.name}</h1>
                 </div>
-                <p className="text-white/80 max-w-xl">
+                <p className="text-white max-w-xl drop-shadow-md font-medium">
                   {sector.description}
                 </p>
                 <div className="flex items-center gap-4 mt-4">
