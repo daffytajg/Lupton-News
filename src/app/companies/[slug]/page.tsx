@@ -39,6 +39,7 @@ import { getCompanyById, COMPANIES, getSalesTeamsForCompany } from '@/data/compa
 import { SECTORS } from '@/data/sectors';
 import { getCompanyIntelligence, getCompanyArticles, getCompanyInsights } from '@/data/companyIntelligence';
 import { getArticlesForCompany, ALL_COMPANY_ARTICLES } from '@/data/allCompanyArticles';
+import { getArticlesForCompany as getHistoricalArticles, HISTORICAL_ARTICLES } from '@/data/historicalArticles';
 
 export default function CompanyDetailPage() {
   const params = useParams();
@@ -81,12 +82,13 @@ export default function CompanyDetailPage() {
     SECTORS.find(s => s.id === sectorId)
   ).filter(Boolean);
 
-  // Get articles and insights - combine from both sources
+  // Get articles and insights - combine from all sources
   const intelligenceArticles = intelligence?.articles || [];
   const companyArticles = getArticlesForCompany(slug);
-  // Combine and deduplicate articles
+  const historicalArticles = getHistoricalArticles(slug);
+  // Combine and deduplicate articles from all sources
   const articlesMap = new Map();
-  [...intelligenceArticles, ...companyArticles].forEach(article => {
+  [...intelligenceArticles, ...companyArticles, ...historicalArticles].forEach(article => {
     if (!articlesMap.has(article.id)) {
       articlesMap.set(article.id, article);
     }

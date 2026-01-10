@@ -9,6 +9,7 @@ import { COMPANIES, getCompaniesBySector } from '@/data/companies';
 import { SECTORS } from '@/data/sectors';
 import { MOCK_NEWS, MOCK_STOCKS } from '@/data/mockNews';
 import { ARTICLE_COUNTS, getArticleCountForCompany } from '@/data/allCompanyArticles';
+import { HISTORICAL_ARTICLE_COUNTS } from '@/data/historicalArticles';
 import { cn, formatPercent } from '@/lib/utils';
 import {
   Search,
@@ -67,15 +68,28 @@ export default function CompaniesPage() {
     );
   };
 
-  // Get article counts for companies - use comprehensive article database
+  // Get article counts for companies - combine all article sources
   const articleCounts = useMemo(() => {
-    // Combine counts from both sources
-    const counts: Record<string, number> = { ...ARTICLE_COUNTS };
+    // Combine counts from all sources: allCompanyArticles, mockNews, and historicalArticles
+    const counts: Record<string, number> = {};
+    
+    // Add counts from allCompanyArticles
+    Object.entries(ARTICLE_COUNTS).forEach(([companyId, count]) => {
+      counts[companyId] = (counts[companyId] || 0) + count;
+    });
+    
+    // Add counts from historical articles
+    Object.entries(HISTORICAL_ARTICLE_COUNTS).forEach(([companyId, count]) => {
+      counts[companyId] = (counts[companyId] || 0) + count;
+    });
+    
+    // Add counts from mock news
     MOCK_NEWS.forEach((article) => {
       article.companies.forEach((companyId) => {
         counts[companyId] = (counts[companyId] || 0) + 1;
       });
     });
+    
     return counts;
   }, []);
 
@@ -126,22 +140,67 @@ export default function CompaniesPage() {
               </div>
 
               {/* Type Filter */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-sm text-gray-500">Type:</span>
-                {(['all', 'oem', 'customer', 'principal'] as const).map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setTypeFilter(type)}
-                    className={cn(
-                      'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors capitalize',
-                      typeFilter === type
-                        ? 'bg-lupton-blue text-white'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    )}
-                  >
-                    {type}
-                  </button>
-                ))}
+                <button
+                  onClick={() => setTypeFilter('all')}
+                  className={cn(
+                    'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                    typeFilter === 'all'
+                      ? 'bg-lupton-blue text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  )}
+                >
+                  All
+                </button>
+                <div className="h-4 w-px bg-gray-300" />
+                <span className="text-xs text-gray-400">Lupton Sells To:</span>
+                <button
+                  onClick={() => setTypeFilter('customer')}
+                  className={cn(
+                    'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                    typeFilter === 'customer'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-green-50 text-green-700 hover:bg-green-100'
+                  )}
+                >
+                  🏢 Customers
+                </button>
+                <div className="h-4 w-px bg-gray-300" />
+                <span className="text-xs text-gray-400">Lupton Represents:</span>
+                <button
+                  onClick={() => setTypeFilter('principal')}
+                  className={cn(
+                    'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                    typeFilter === 'principal'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-purple-50 text-purple-700 hover:bg-purple-100'
+                  )}
+                >
+                  🏭 Principals
+                </button>
+                <button
+                  onClick={() => setTypeFilter('manufacturer')}
+                  className={cn(
+                    'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                    typeFilter === 'manufacturer'
+                      ? 'bg-orange-600 text-white'
+                      : 'bg-orange-50 text-orange-700 hover:bg-orange-100'
+                  )}
+                >
+                  ⚙️ Manufacturers
+                </button>
+                <button
+                  onClick={() => setTypeFilter('oem')}
+                  className={cn(
+                    'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                    typeFilter === 'oem'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                  )}
+                >
+                  🔧 OEMs
+                </button>
               </div>
 
               {/* Sector Filter */}

@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { MOCK_NEWS, MOCK_AI_INSIGHTS } from '@/data/mockNews';
 import { ALL_COMPANY_ARTICLES } from '@/data/allCompanyArticles';
+import { HISTORICAL_ARTICLES } from '@/data/historicalArticles';
 import { COMPANIES } from '@/data/companies';
 import { SECTORS, NEWS_CATEGORIES } from '@/data/sectors';
 import { useState } from 'react';
@@ -33,8 +34,10 @@ export default function ArticlePage() {
   const [showShareToast, setShowShareToast] = useState(false);
   
   const articleId = params.id as string;
-  // Search in both MOCK_NEWS and ALL_COMPANY_ARTICLES
-  const article = MOCK_NEWS.find(a => a.id === articleId) || ALL_COMPANY_ARTICLES.find(a => a.id === articleId);
+  // Search in all article sources: MOCK_NEWS, ALL_COMPANY_ARTICLES, and HISTORICAL_ARTICLES
+  const article = MOCK_NEWS.find(a => a.id === articleId) 
+    || ALL_COMPANY_ARTICLES.find(a => a.id === articleId)
+    || HISTORICAL_ARTICLES.find(a => a.id === articleId);
   
   if (!article) {
     return (
@@ -121,8 +124,8 @@ export default function ArticlePage() {
     }
   };
 
-  // Related articles from same companies or sectors - search both sources
-  const allArticles = [...MOCK_NEWS, ...ALL_COMPANY_ARTICLES];
+  // Related articles from same companies or sectors - search all sources
+  const allArticles = [...MOCK_NEWS, ...ALL_COMPANY_ARTICLES, ...HISTORICAL_ARTICLES];
   const relatedArticles = allArticles
     .filter(a => a.id !== article.id)
     .filter(a => 
