@@ -194,7 +194,11 @@ export default function CompaniesPage() {
           {viewMode === 'grid' ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredCompanies.map((company) => {
-                const stock = MOCK_STOCKS.find((s) => s.companyId === company.id || s.ticker === company.ticker);
+                const stock = MOCK_STOCKS.find((s) => 
+                  s.companyId === company.id || 
+                  s.symbol === company.ticker || 
+                  s.ticker === company.ticker
+                );
                 const articleCount = articleCounts[company.id] || 0;
                 const isFollowed = followedCompanies.includes(company.id);
 
@@ -317,7 +321,11 @@ export default function CompaniesPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {filteredCompanies.map((company) => {
-                    const stock = MOCK_STOCKS.find((s) => s.companyId === company.id || s.ticker === company.ticker);
+                    const stock = MOCK_STOCKS.find((s) => 
+                  s.companyId === company.id || 
+                  s.symbol === company.ticker || 
+                  s.ticker === company.ticker
+                );
                     const articleCount = articleCounts[company.id] || 0;
                     const isFollowed = followedCompanies.includes(company.id);
 
