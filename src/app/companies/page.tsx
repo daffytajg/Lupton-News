@@ -196,8 +196,7 @@ export default function CompaniesPage() {
               {filteredCompanies.map((company) => {
                 const stock = MOCK_STOCKS.find((s) => 
                   s.companyId === company.id || 
-                  s.symbol === company.ticker || 
-                  s.ticker === company.ticker
+                  (company.ticker && s.symbol === company.ticker)
                 );
                 const articleCount = articleCounts[company.id] || 0;
                 const isFollowed = followedCompanies.includes(company.id);
@@ -323,8 +322,7 @@ export default function CompaniesPage() {
                   {filteredCompanies.map((company) => {
                     const stock = MOCK_STOCKS.find((s) => 
                   s.companyId === company.id || 
-                  s.symbol === company.ticker || 
-                  s.ticker === company.ticker
+                  (company.ticker && s.symbol === company.ticker)
                 );
                     const articleCount = articleCounts[company.id] || 0;
                     const isFollowed = followedCompanies.includes(company.id);
