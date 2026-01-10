@@ -38,6 +38,7 @@ import Header from '@/components/Header';
 import { getCompanyById, COMPANIES, getSalesTeamsForCompany } from '@/data/companies';
 import { SECTORS } from '@/data/sectors';
 import { getCompanyIntelligence, getCompanyArticles, getCompanyInsights } from '@/data/companyIntelligence';
+import { getArticlesForCompany, ALL_COMPANY_ARTICLES } from '@/data/allCompanyArticles';
 
 export default function CompanyDetailPage() {
   const params = useParams();
@@ -80,8 +81,19 @@ export default function CompanyDetailPage() {
     SECTORS.find(s => s.id === sectorId)
   ).filter(Boolean);
 
-  // Get articles and insights
-  const articles = intelligence?.articles || [];
+  // Get articles and insights - combine from both sources
+  const intelligenceArticles = intelligence?.articles || [];
+  const companyArticles = getArticlesForCompany(slug);
+  // Combine and deduplicate articles
+  const articlesMap = new Map();
+  [...intelligenceArticles, ...companyArticles].forEach(article => {
+    if (!articlesMap.has(article.id)) {
+      articlesMap.set(article.id, article);
+    }
+  });
+  const articles = Array.from(articlesMap.values()).sort((a, b) => 
+    new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+  );
   const insights = intelligence?.insights || [];
   const stockData = intelligence?.stockData;
   const financials = intelligence?.financials;

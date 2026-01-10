@@ -8,6 +8,7 @@ import Sidebar from '@/components/Sidebar';
 import { COMPANIES, getCompaniesBySector } from '@/data/companies';
 import { SECTORS } from '@/data/sectors';
 import { MOCK_NEWS, MOCK_STOCKS } from '@/data/mockNews';
+import { ARTICLE_COUNTS, getArticleCountForCompany } from '@/data/allCompanyArticles';
 import { cn, formatPercent } from '@/lib/utils';
 import {
   Search,
@@ -66,9 +67,10 @@ export default function CompaniesPage() {
     );
   };
 
-  // Get article counts for companies
+  // Get article counts for companies - use comprehensive article database
   const articleCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
+    // Combine counts from both sources
+    const counts: Record<string, number> = { ...ARTICLE_COUNTS };
     MOCK_NEWS.forEach((article) => {
       article.companies.forEach((companyId) => {
         counts[companyId] = (counts[companyId] || 0) + 1;
@@ -192,7 +194,7 @@ export default function CompaniesPage() {
           {viewMode === 'grid' ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredCompanies.map((company) => {
-                const stock = MOCK_STOCKS.find((s) => s.ticker === company.ticker);
+                const stock = MOCK_STOCKS.find((s) => s.companyId === company.id || s.ticker === company.ticker);
                 const articleCount = articleCounts[company.id] || 0;
                 const isFollowed = followedCompanies.includes(company.id);
 
@@ -315,7 +317,7 @@ export default function CompaniesPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {filteredCompanies.map((company) => {
-                    const stock = MOCK_STOCKS.find((s) => s.ticker === company.ticker);
+                    const stock = MOCK_STOCKS.find((s) => s.companyId === company.id || s.ticker === company.ticker);
                     const articleCount = articleCounts[company.id] || 0;
                     const isFollowed = followedCompanies.includes(company.id);
 

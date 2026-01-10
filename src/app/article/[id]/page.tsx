@@ -21,6 +21,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { MOCK_NEWS, MOCK_AI_INSIGHTS } from '@/data/mockNews';
+import { ALL_COMPANY_ARTICLES } from '@/data/allCompanyArticles';
 import { COMPANIES } from '@/data/companies';
 import { SECTORS, NEWS_CATEGORIES } from '@/data/sectors';
 import { useState } from 'react';
@@ -32,7 +33,8 @@ export default function ArticlePage() {
   const [showShareToast, setShowShareToast] = useState(false);
   
   const articleId = params.id as string;
-  const article = MOCK_NEWS.find(a => a.id === articleId);
+  // Search in both MOCK_NEWS and ALL_COMPANY_ARTICLES
+  const article = MOCK_NEWS.find(a => a.id === articleId) || ALL_COMPANY_ARTICLES.find(a => a.id === articleId);
   
   if (!article) {
     return (
@@ -119,14 +121,15 @@ export default function ArticlePage() {
     }
   };
 
-  // Related articles from same companies or sectors
-  const relatedArticles = MOCK_NEWS
+  // Related articles from same companies or sectors - search both sources
+  const allArticles = [...MOCK_NEWS, ...ALL_COMPANY_ARTICLES];
+  const relatedArticles = allArticles
     .filter(a => a.id !== article.id)
     .filter(a => 
       a.companies.some(c => article.companies.includes(c)) ||
       a.sectors.some(s => article.sectors.includes(s))
     )
-    .slice(0, 3);
+    .slice(0, 5);
 
   return (
     <div className="min-h-screen bg-gray-50">
