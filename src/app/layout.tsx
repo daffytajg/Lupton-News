@@ -4,6 +4,7 @@ import { Providers } from '@/components/Providers';
 import { Footer } from '@/components/Footer';
 import { AIChatAssistant } from '@/components/AIChatAssistant';
 import { StockTicker } from '@/components/StockTicker';
+import { AppSidebar } from '@/components/AppSidebar';
 
 export const metadata: Metadata = {
   title: 'Lupton News Intelligence | OEM & Customer News Alerts',
@@ -20,11 +21,18 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased min-h-screen flex flex-col">
         <Providers>
-          <StockTicker />
-          <div className="flex-1">
-            {children}
+          {/* Persistent Sidebar - visible on lg screens and up */}
+          <AppSidebar />
+          
+          {/* Main Content Area - offset by sidebar width on lg screens */}
+          <div className="lg:pl-64 flex flex-col min-h-screen transition-all duration-300">
+            <StockTicker />
+            <div className="flex-1">
+              {children}
+            </div>
+            <Footer />
           </div>
-          <Footer />
+          
           <AIChatAssistant />
         </Providers>
       </body>

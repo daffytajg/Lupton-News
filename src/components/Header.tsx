@@ -224,6 +224,7 @@ export default function Header({ onMenuToggle, isMobileMenuOpen }: HeaderProps) 
             <div>
               <h2 className="font-bold text-lg text-lupton-navy dark:text-white">Lupton News</h2>
               <p className="text-xs text-gray-500 dark:text-gray-400">Intelligence Platform</p>
+              <p className="text-[9px] text-gray-400 dark:text-gray-500 mt-1">Built by Joe Guadagnino | Powered by Google Cloud</p>
             </div>
           </div>
           <button
