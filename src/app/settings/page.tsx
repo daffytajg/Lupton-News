@@ -12,7 +12,6 @@ import {
   Shield,
   ChevronRight,
   Check,
-  Phone,
   Save,
 } from 'lucide-react';
 import { SECTORS } from '@/data/sectors';
@@ -107,8 +106,6 @@ function NotificationSettings() {
   const [settings, setSettings] = useState({
     emailEnabled: true,
     pushEnabled: true,
-    smsEnabled: false,
-    smsPhoneNumber: '',
     breakingNewsOnly: false,
     categories: ['government-contracts', 'mergers-acquisitions', 'c-suite', 'quarterly-filings'],
     sectors: ['datacenter', 'military-aerospace'],
@@ -150,39 +147,6 @@ function NotificationSettings() {
             enabled={settings.pushEnabled}
             onChange={(v) => setSettings({ ...settings, pushEnabled: v })}
           />
-          
-          {/* SMS Alerts with Phone Number Input */}
-          <div className="space-y-3">
-            <ToggleItem
-              label="SMS Alerts"
-              description="Text messages for critical alerts only"
-              enabled={settings.smsEnabled}
-              onChange={(v) => setSettings({ ...settings, smsEnabled: v })}
-            />
-            
-            {settings.smsEnabled && (
-              <div className="ml-0 pl-4 border-l-2 border-lupton-blue">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mobile Phone Number
-                </label>
-                <div className="flex items-center gap-2">
-                  <div className="relative flex-1 max-w-xs">
-                    <Phone size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="tel"
-                      placeholder="+1 (555) 123-4567"
-                      value={settings.smsPhoneNumber}
-                      onChange={(e) => setSettings({ ...settings, smsPhoneNumber: e.target.value })}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue text-gray-900"
-                    />
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Standard messaging rates may apply. You will only receive SMS for critical priority alerts.
-                </p>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
@@ -317,33 +281,6 @@ function NotificationSettings() {
           >
             <Mail size={16} />
             Send Test Email
-          </button>
-          <button
-            onClick={async () => {
-              if (!settings.smsPhoneNumber) {
-                alert('Please enter your phone number above first.');
-                return;
-              }
-              try {
-                const res = await fetch('/api/test-notifications', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ type: 'sms', phone: settings.smsPhoneNumber }),
-                });
-                const data = await res.json();
-                if (data.success) {
-                  alert('Test SMS sent! Check your phone.');
-                } else {
-                  alert('Failed to send: ' + (data.error || 'Unknown error'));
-                }
-              } catch (err) {
-                alert('Failed to send test SMS');
-              }
-            }}
-            className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors flex items-center gap-2"
-          >
-            <Phone size={16} />
-            Send Test SMS
           </button>
         </div>
       </div>

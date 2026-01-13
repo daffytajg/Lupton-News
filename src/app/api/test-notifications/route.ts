@@ -1,14 +1,13 @@
-// API endpoint for testing email and SMS notifications
+// API endpoint for testing email notifications
 // Users can send test messages from the settings page
 
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { sendSMSAlert, isTwilioConfigured, isValidPhoneNumber } from '@/lib/sms';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { type, email, phone, name } = body;
+    const { type, email, name } = body;
 
     if (type === 'email') {
       // Test email
@@ -76,36 +75,6 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json({ success: true, message: 'Test email sent successfully!' });
-
-    } else if (type === 'sms') {
-      // Test SMS
-      if (!isTwilioConfigured()) {
-        return NextResponse.json({ 
-          success: false, 
-          error: 'SMS service not configured. Please add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER to environment variables.' 
-        }, { status: 500 });
-      }
-
-      if (!phone) {
-        return NextResponse.json({ success: false, error: 'Phone number required' }, { status: 400 });
-      }
-
-      if (!isValidPhoneNumber(phone)) {
-        return NextResponse.json({ success: false, error: 'Invalid phone number format' }, { status: 400 });
-      }
-
-      const result = await sendSMSAlert({
-        to: phone,
-        alertType: 'critical',
-        headline: 'Test Alert - Your SMS notifications are working!',
-        summary: 'You will receive critical alerts when breaking news affects your companies.',
-      });
-
-      if (!result.success) {
-        return NextResponse.json({ success: false, error: result.error }, { status: 500 });
-      }
-
-      return NextResponse.json({ success: true, message: 'Test SMS sent successfully!' });
 
     } else {
       return NextResponse.json({ success: false, error: 'Invalid notification type' }, { status: 400 });

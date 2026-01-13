@@ -163,11 +163,6 @@ export interface NotificationPreferences {
     breakingOnly: boolean;
     categories: NewsCategory[];
   };
-  sms?: {
-    enabled: boolean;
-    phone?: string;
-    criticalOnly: boolean;
-  };
 }
 
 // Alert/Notification
