@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import { cn } from '@/lib/utils';
@@ -10,17 +10,29 @@ import {
   Mail,
   Building2,
   Shield,
-  Palette,
-  Globe,
   ChevronRight,
   Check,
-  X,
+  Phone,
+  Save,
 } from 'lucide-react';
 import { SECTORS } from '@/data/sectors';
 import { NEWS_CATEGORIES } from '@/data/sectors';
 import { COMPANIES } from '@/data/companies';
 
 type SettingsTab = 'profile' | 'notifications' | 'companies' | 'email' | 'security';
+
+// Helper to get/set localStorage safely
+const getStoredValue = (key: string, defaultValue: any) => {
+  if (typeof window === 'undefined') return defaultValue;
+  const stored = localStorage.getItem(key);
+  return stored ? JSON.parse(stored) : defaultValue;
+};
+
+const setStoredValue = (key: string, value: any) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+};
 
 export default function SettingsPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -96,11 +108,30 @@ function NotificationSettings() {
     emailEnabled: true,
     pushEnabled: true,
     smsEnabled: false,
+    smsPhoneNumber: '',
     breakingNewsOnly: false,
     categories: ['government-contracts', 'mergers-acquisitions', 'c-suite', 'quarterly-filings'],
     sectors: ['datacenter', 'military-aerospace'],
-    priority: 'high', // critical, high, medium, all
+    priority: 'high',
   });
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+
+  // Load settings from localStorage on mount
+  useEffect(() => {
+    const stored = getStoredValue('notificationSettings', null);
+    if (stored) {
+      setSettings(stored);
+    }
+  }, []);
+
+  const handleSave = () => {
+    setSaveStatus('saving');
+    setStoredValue('notificationSettings', settings);
+    setTimeout(() => {
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    }, 500);
+  };
 
   return (
     <div className="space-y-6">
@@ -119,12 +150,39 @@ function NotificationSettings() {
             enabled={settings.pushEnabled}
             onChange={(v) => setSettings({ ...settings, pushEnabled: v })}
           />
-          <ToggleItem
-            label="SMS Alerts"
-            description="Text messages for critical alerts only"
-            enabled={settings.smsEnabled}
-            onChange={(v) => setSettings({ ...settings, smsEnabled: v })}
-          />
+          
+          {/* SMS Alerts with Phone Number Input */}
+          <div className="space-y-3">
+            <ToggleItem
+              label="SMS Alerts"
+              description="Text messages for critical alerts only"
+              enabled={settings.smsEnabled}
+              onChange={(v) => setSettings({ ...settings, smsEnabled: v })}
+            />
+            
+            {settings.smsEnabled && (
+              <div className="ml-0 pl-4 border-l-2 border-lupton-blue">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Mobile Phone Number
+                </label>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1 max-w-xs">
+                    <Phone size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="tel"
+                      placeholder="+1 (555) 123-4567"
+                      value={settings.smsPhoneNumber}
+                      onChange={(e) => setSettings({ ...settings, smsPhoneNumber: e.target.value })}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue text-gray-900"
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Standard messaging rates may apply. You will only receive SMS for critical priority alerts.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -225,8 +283,32 @@ function NotificationSettings() {
         </div>
       </div>
 
-      <button className="w-full md:w-auto px-6 py-3 bg-lupton-blue text-white font-medium rounded-lg hover:bg-lupton-navy transition-colors">
-        Save Notification Settings
+      <button 
+        onClick={handleSave}
+        disabled={saveStatus === 'saving'}
+        className={cn(
+          "w-full md:w-auto px-6 py-3 font-medium rounded-lg transition-colors flex items-center gap-2",
+          saveStatus === 'saved' 
+            ? "bg-green-600 text-white" 
+            : "bg-lupton-blue text-white hover:bg-lupton-navy"
+        )}
+      >
+        {saveStatus === 'saving' ? (
+          <>
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            Saving...
+          </>
+        ) : saveStatus === 'saved' ? (
+          <>
+            <Check size={18} />
+            Saved!
+          </>
+        ) : (
+          <>
+            <Save size={18} />
+            Save Notification Settings
+          </>
+        )}
       </button>
     </div>
   );
@@ -236,6 +318,23 @@ function CompanySettings() {
   const [assignedCompanies, setAssignedCompanies] = useState([
     'nvidia', 'lockheed', 'paccar', 'medtronic', 'fanuc'
   ]);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+
+  useEffect(() => {
+    const stored = getStoredValue('assignedCompanies', null);
+    if (stored) {
+      setAssignedCompanies(stored);
+    }
+  }, []);
+
+  const handleSave = () => {
+    setSaveStatus('saving');
+    setStoredValue('assignedCompanies', assignedCompanies);
+    setTimeout(() => {
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    }, 500);
+  };
 
   return (
     <div className="space-y-6">
@@ -266,40 +365,65 @@ function CompanySettings() {
                   </div>
                 </div>
                 <button
-                  onClick={() =>
-                    setAssignedCompanies(assignedCompanies.filter((c) => c !== companyId))
-                  }
-                  className="p-1 hover:bg-white rounded"
+                  onClick={() => setAssignedCompanies(assignedCompanies.filter((c) => c !== companyId))}
+                  className="p-1.5 rounded-lg hover:bg-red-100 text-red-500 transition-colors"
                 >
-                  <X size={16} className="text-gray-400" />
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
             );
           })}
         </div>
 
-        <h3 className="font-medium text-gray-900 mb-3">Add Companies</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto">
-          {COMPANIES.filter((c) => !assignedCompanies.includes(c.id)).map((company) => (
-            <button
-              key={company.id}
-              onClick={() => setAssignedCompanies([...assignedCompanies, company.id])}
-              className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-lupton-blue hover:bg-blue-50 transition-colors text-left"
-            >
-              <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-                <span className="font-bold text-gray-500 text-sm">{company.name.charAt(0)}</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900 text-sm truncate">{company.name}</p>
-                <p className="text-xs text-gray-500">{company.ticker || company.type}</p>
-              </div>
-            </button>
-          ))}
+        <div className="border-t border-gray-100 pt-4">
+          <h3 className="font-medium text-gray-900 mb-3">Add Companies</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-64 overflow-y-auto">
+            {COMPANIES.filter((c) => !assignedCompanies.includes(c.id))
+              .slice(0, 20)
+              .map((company) => (
+                <button
+                  key={company.id}
+                  onClick={() => setAssignedCompanies([...assignedCompanies, company.id])}
+                  className="flex items-center gap-2 p-2 rounded-lg border border-gray-200 hover:border-lupton-blue hover:bg-blue-50 transition-colors text-left"
+                >
+                  <div className="w-6 h-6 rounded bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-bold text-gray-500">{company.name.charAt(0)}</span>
+                  </div>
+                  <span className="text-sm text-gray-700 truncate">{company.name}</span>
+                </button>
+              ))}
+          </div>
         </div>
       </div>
 
-      <button className="w-full md:w-auto px-6 py-3 bg-lupton-blue text-white font-medium rounded-lg hover:bg-lupton-navy transition-colors">
-        Save Company Assignments
+      <button 
+        onClick={handleSave}
+        disabled={saveStatus === 'saving'}
+        className={cn(
+          "w-full md:w-auto px-6 py-3 font-medium rounded-lg transition-colors flex items-center gap-2",
+          saveStatus === 'saved' 
+            ? "bg-green-600 text-white" 
+            : "bg-lupton-blue text-white hover:bg-lupton-navy"
+        )}
+      >
+        {saveStatus === 'saving' ? (
+          <>
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            Saving...
+          </>
+        ) : saveStatus === 'saved' ? (
+          <>
+            <Check size={18} />
+            Saved!
+          </>
+        ) : (
+          <>
+            <Save size={18} />
+            Save Company Settings
+          </>
+        )}
       </button>
     </div>
   );
@@ -309,21 +433,37 @@ function EmailDigestSettings() {
   const [settings, setSettings] = useState({
     enabled: true,
     frequency: 'daily',
-    time: '08:00',
-    includeSectors: true,
-    includeCompanies: true,
-    includeAI: true,
+    time: '07:00',
+    includeAIInsights: true,
     includeStocks: true,
+    includeSectorSummary: true,
   });
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+
+  useEffect(() => {
+    const stored = getStoredValue('emailDigestSettings', null);
+    if (stored) {
+      setSettings(stored);
+    }
+  }, []);
+
+  const handleSave = () => {
+    setSaveStatus('saving');
+    setStoredValue('emailDigestSettings', settings);
+    setTimeout(() => {
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    }, 500);
+  };
 
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-xl border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Daily Email Digest</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Receive a comprehensive summary of all news and insights.
+            <h2 className="text-lg font-semibold text-gray-900">Email Digest</h2>
+            <p className="text-sm text-gray-500">
+              Receive a summary of news and insights delivered to your inbox.
             </p>
           </div>
           <ToggleSwitch
@@ -334,76 +474,60 @@ function EmailDigestSettings() {
 
         {settings.enabled && (
           <>
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Delivery Frequency
-              </label>
-              <div className="grid grid-cols-3 gap-3">
-                {['daily', 'twice-daily', 'weekly'].map((freq) => (
-                  <button
-                    key={freq}
-                    onClick={() => setSettings({ ...settings, frequency: freq })}
-                    className={cn(
-                      'p-3 rounded-lg border text-sm font-medium capitalize transition-colors',
-                      settings.frequency === freq
-                        ? 'bg-lupton-blue text-white border-lupton-blue'
-                        : 'bg-white text-gray-600 border-gray-200 hover:border-lupton-blue'
-                    )}
-                  >
-                    {freq.replace('-', ' ')}
-                  </button>
-                ))}
+            <div className="grid md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Frequency
+                </label>
+                <select
+                  value={settings.frequency}
+                  onChange={(e) => setSettings({ ...settings, frequency: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue"
+                >
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly (Monday)</option>
+                  <option value="both">Daily + Weekly Summary</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Delivery Time
+                </label>
+                <select
+                  value={settings.time}
+                  onChange={(e) => setSettings({ ...settings, time: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue"
+                >
+                  <option value="06:00">6:00 AM</option>
+                  <option value="07:00">7:00 AM</option>
+                  <option value="08:00">8:00 AM</option>
+                  <option value="09:00">9:00 AM</option>
+                  <option value="17:00">5:00 PM</option>
+                  <option value="18:00">6:00 PM</option>
+                </select>
               </div>
             </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Delivery Time
-              </label>
-              <select
-                value={settings.time}
-                onChange={(e) => setSettings({ ...settings, time: e.target.value })}
-                className="w-full md:w-48 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue"
-              >
-                <option value="06:00">6:00 AM</option>
-                <option value="07:00">7:00 AM</option>
-                <option value="08:00">8:00 AM</option>
-                <option value="09:00">9:00 AM</option>
-                <option value="17:00">5:00 PM</option>
-                <option value="18:00">6:00 PM</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Include in Digest
-              </label>
-              <div className="space-y-3">
-                <ToggleItem
-                  label="Sector Highlights"
-                  description="Top news from each of your followed sectors"
-                  enabled={settings.includeSectors}
-                  onChange={(v) => setSettings({ ...settings, includeSectors: v })}
-                />
-                <ToggleItem
-                  label="Company Updates"
-                  description="News about your assigned companies"
-                  enabled={settings.includeCompanies}
-                  onChange={(v) => setSettings({ ...settings, includeCompanies: v })}
-                />
-                <ToggleItem
-                  label="AI Predictions & Insights"
-                  description="AI-generated market predictions and trends"
-                  enabled={settings.includeAI}
-                  onChange={(v) => setSettings({ ...settings, includeAI: v })}
-                />
-                <ToggleItem
-                  label="Stock Movers"
-                  description="Significant stock movements for tracked companies"
-                  enabled={settings.includeStocks}
-                  onChange={(v) => setSettings({ ...settings, includeStocks: v })}
-                />
-              </div>
+            <div className="space-y-4">
+              <h3 className="font-medium text-gray-900">Include in Digest</h3>
+              <ToggleItem
+                label="AI Insights"
+                description="AI-generated predictions and analysis"
+                enabled={settings.includeAIInsights}
+                onChange={(v) => setSettings({ ...settings, includeAIInsights: v })}
+              />
+              <ToggleItem
+                label="Sector Summary"
+                description="Overview of news by industry sector"
+                enabled={settings.includeSectorSummary}
+                onChange={(v) => setSettings({ ...settings, includeSectorSummary: v })}
+              />
+              <ToggleItem
+                label="Stock Movers"
+                description="Significant stock movements for tracked companies"
+                enabled={settings.includeStocks}
+                onChange={(v) => setSettings({ ...settings, includeStocks: v })}
+              />
             </div>
           </>
         )}
@@ -427,66 +551,218 @@ function EmailDigestSettings() {
           <div className="space-y-3 text-sm text-gray-600">
             <p><strong>📰 Top Stories:</strong> 15 new articles across your sectors</p>
             <p><strong>🏢 Company Updates:</strong> 5 updates on your assigned companies</p>
-            <p><strong>✨ AI Insights:</strong> 3 new predictions to review</p>
-            <p><strong>📈 Stock Movers:</strong> NVDA +2.75%, MDT -2.37%</p>
+            {settings.includeAIInsights && <p><strong>✨ AI Insights:</strong> 3 new predictions to review</p>}
+            {settings.includeStocks && <p><strong>📈 Stock Movers:</strong> NVDA +2.75%, MDT -2.37%</p>}
           </div>
         </div>
       </div>
 
-      <button className="w-full md:w-auto px-6 py-3 bg-lupton-blue text-white font-medium rounded-lg hover:bg-lupton-navy transition-colors">
-        Save Email Settings
+      <button 
+        onClick={handleSave}
+        disabled={saveStatus === 'saving'}
+        className={cn(
+          "w-full md:w-auto px-6 py-3 font-medium rounded-lg transition-colors flex items-center gap-2",
+          saveStatus === 'saved' 
+            ? "bg-green-600 text-white" 
+            : "bg-lupton-blue text-white hover:bg-lupton-navy"
+        )}
+      >
+        {saveStatus === 'saving' ? (
+          <>
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            Saving...
+          </>
+        ) : saveStatus === 'saved' ? (
+          <>
+            <Check size={18} />
+            Saved!
+          </>
+        ) : (
+          <>
+            <Save size={18} />
+            Save Email Settings
+          </>
+        )}
       </button>
     </div>
   );
 }
 
 function ProfileSettings() {
+  const [profile, setProfile] = useState({
+    fullName: '',
+    email: '',
+    role: 'Sales',
+    phone: '',
+    title: '',
+  });
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load profile from localStorage on mount
+  useEffect(() => {
+    const stored = getStoredValue('userProfile', {
+      fullName: 'Alan Lupton II',
+      email: 'alan@luptons.com',
+      role: 'Admin',
+      phone: '',
+      title: 'President',
+    });
+    setProfile(stored);
+    setIsLoaded(true);
+  }, []);
+
+  const handleSave = () => {
+    setSaveStatus('saving');
+    setStoredValue('userProfile', profile);
+    setTimeout(() => {
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    }, 500);
+  };
+
+  if (!isLoaded) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-100 p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-10 bg-gray-200 rounded"></div>
+          <div className="h-10 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-6">Profile Information</h2>
-      <div className="space-y-4 max-w-md">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-          <input
-            type="text"
-            defaultValue="Alan Lupton II"
-            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue"
-          />
+    <div className="space-y-6">
+      <div className="bg-white rounded-xl border border-gray-100 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-6">Profile Information</h2>
+        <div className="space-y-4 max-w-md">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+            <input
+              type="text"
+              value={profile.fullName}
+              onChange={(e) => setProfile({ ...profile, fullName: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              type="email"
+              value={profile.email}
+              onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+            <input
+              type="tel"
+              value={profile.phone}
+              onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+              placeholder="+1 (555) 123-4567"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
+            <input
+              type="text"
+              value={profile.title}
+              onChange={(e) => setProfile({ ...profile, title: e.target.value })}
+              placeholder="e.g., Sales Manager"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+            <select 
+              value={profile.role}
+              onChange={(e) => setProfile({ ...profile, role: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue"
+            >
+              <option>Admin</option>
+              <option>Manager</option>
+              <option>Sales</option>
+              <option>Viewer</option>
+            </select>
+          </div>
+          
+          <button 
+            onClick={handleSave}
+            disabled={saveStatus === 'saving'}
+            className={cn(
+              "px-6 py-2 font-medium rounded-lg transition-colors flex items-center gap-2",
+              saveStatus === 'saved' 
+                ? "bg-green-600 text-white" 
+                : "bg-lupton-blue text-white hover:bg-lupton-navy"
+            )}
+          >
+            {saveStatus === 'saving' ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Saving...
+              </>
+            ) : saveStatus === 'saved' ? (
+              <>
+                <Check size={18} />
+                Profile Saved!
+              </>
+            ) : (
+              <>
+                <Save size={18} />
+                Update Profile
+              </>
+            )}
+          </button>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <input
-            type="email"
-            defaultValue="alan@luptons.com"
-            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-          <select className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue">
-            <option>Admin</option>
-            <option>Manager</option>
-            <option>Sales</option>
-            <option>Viewer</option>
-          </select>
-        </div>
-        <button className="px-6 py-2 bg-lupton-blue text-white font-medium rounded-lg hover:bg-lupton-navy transition-colors">
-          Update Profile
-        </button>
       </div>
     </div>
   );
 }
 
 function SecuritySettings() {
+  const [passwords, setPasswords] = useState({
+    current: '',
+    new: '',
+    confirm: '',
+  });
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleSave = () => {
+    if (passwords.new !== passwords.confirm) {
+      setSaveStatus('error');
+      setErrorMessage('New passwords do not match');
+      return;
+    }
+    if (passwords.new.length < 8) {
+      setSaveStatus('error');
+      setErrorMessage('Password must be at least 8 characters');
+      return;
+    }
+    
+    setSaveStatus('saving');
+    // In a real app, this would call an API
+    setTimeout(() => {
+      setSaveStatus('saved');
+      setPasswords({ current: '', new: '', confirm: '' });
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    }, 500);
+  };
+
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-6">
       <h2 className="text-lg font-semibold text-gray-900 mb-6">Security Settings</h2>
-      <div className="space-y-6 max-w-md">
+      <div className="space-y-4 max-w-md">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
           <input
             type="password"
+            value={passwords.current}
+            onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
             className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue"
           />
         </div>
@@ -494,6 +770,8 @@ function SecuritySettings() {
           <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
           <input
             type="password"
+            value={passwords.new}
+            onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
             className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue"
           />
         </div>
@@ -501,11 +779,42 @@ function SecuritySettings() {
           <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
           <input
             type="password"
+            value={passwords.confirm}
+            onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
             className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lupton-blue"
           />
         </div>
-        <button className="px-6 py-2 bg-lupton-blue text-white font-medium rounded-lg hover:bg-lupton-navy transition-colors">
-          Change Password
+        
+        {saveStatus === 'error' && (
+          <p className="text-sm text-red-600">{errorMessage}</p>
+        )}
+        
+        <button 
+          onClick={handleSave}
+          disabled={saveStatus === 'saving'}
+          className={cn(
+            "px-6 py-2 font-medium rounded-lg transition-colors flex items-center gap-2",
+            saveStatus === 'saved' 
+              ? "bg-green-600 text-white" 
+              : "bg-lupton-blue text-white hover:bg-lupton-navy"
+          )}
+        >
+          {saveStatus === 'saving' ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Updating...
+            </>
+          ) : saveStatus === 'saved' ? (
+            <>
+              <Check size={18} />
+              Password Updated!
+            </>
+          ) : (
+            <>
+              <Save size={18} />
+              Update Password
+            </>
+          )}
         </button>
       </div>
     </div>
