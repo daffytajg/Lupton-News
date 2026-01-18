@@ -160,10 +160,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 Admin
               </p>
               <NavItem
-                href="/companies/manage"
+                href="/admin/companies"
                 icon={<Factory size={18} />}
                 label="Manage Companies"
-                isActive={pathname === '/companies/manage'}
+                isActive={pathname === '/admin/companies'}
                 onClick={onClose}
               />
             </div>
