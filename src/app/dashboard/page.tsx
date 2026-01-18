@@ -33,6 +33,12 @@ export default function DashboardPage() {
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [selectedSector, setSelectedSector] = useState<string>('all');
   const [timeRange, setTimeRange] = useState<string>('24h');
+  const [timeOfDay, setTimeOfDay] = useState<string>('');
+
+  useEffect(() => {
+    // Set time of day on client side to avoid hydration mismatch
+    setTimeOfDay(getTimeOfDay());
+  }, []);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -116,7 +122,7 @@ export default function DashboardPage() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-white mb-2">
-            Good {getTimeOfDay()}, {firstName}
+            Good {timeOfDay || 'day'}, {firstName}
           </h2>
           <p className="text-slate-400">
             Here's what's happening across your accounts and industries today.

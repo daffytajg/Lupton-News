@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Cloud } from 'lucide-react';
@@ -9,7 +10,11 @@ interface FooterProps {
 }
 
 export function Footer({ className }: FooterProps) {
-  const currentYear = new Date().getFullYear();
+  const [currentYear, setCurrentYear] = useState(2026);
+  
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
 
   return (
     <footer className={`bg-gray-900 text-gray-400 py-6 px-6 ${className || ''}`}>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import NewsCard from '@/components/NewsCard';
@@ -41,13 +41,17 @@ export default function EmailDigestPage() {
     }));
   };
 
-  // Get today's date formatted
-  const today = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  // Get today's date formatted (client-side only to avoid hydration mismatch)
+  const [today, setToday] = useState('');
+  
+  useEffect(() => {
+    setToday(new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }));
+  }, []);
 
   // Top stories (first 5)
   const topStories = MOCK_NEWS.slice(0, 5);

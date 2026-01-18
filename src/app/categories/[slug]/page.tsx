@@ -139,7 +139,7 @@ export default function CategoryPage() {
           </div>
           <div className="mt-6 flex items-center gap-4 text-sm">
             <span className="bg-white/20 px-3 py-1 rounded-full">
-              {categoryNews.length} articles
+              {categoryNews.length} {categoryNews.length === 1 ? 'article' : 'articles'}
             </span>
           </div>
         </div>

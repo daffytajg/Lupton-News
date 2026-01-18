@@ -16,7 +16,7 @@ export const SECTORS: SectorInfo[] = [
     shortName: 'Trucks',
     icon: '🚛',
     color: '#f97316',
-    gradient: 'from-orange-500 to-orange-600',
+    gradient: 'from-orange-600 to-orange-700',
     description: 'Commercial vehicles, heavy-duty trucks, trailers, and transportation equipment',
   },
   {
@@ -25,7 +25,7 @@ export const SECTORS: SectorInfo[] = [
     shortName: 'Defense',
     icon: '✈️',
     color: '#22c55e',
-    gradient: 'from-green-500 to-green-600',
+    gradient: 'from-green-600 to-green-700',
     description: 'Defense contractors, aerospace, military equipment, and government contracts',
   },
   {
@@ -34,7 +34,7 @@ export const SECTORS: SectorInfo[] = [
     shortName: 'Robotics',
     icon: '🤖',
     color: '#8b5cf6',
-    gradient: 'from-purple-500 to-purple-600',
+    gradient: 'from-purple-600 to-purple-700',
     description: 'Industrial robotics, automation systems, AI/ML applications, and smart manufacturing',
   },
   {
@@ -43,7 +43,7 @@ export const SECTORS: SectorInfo[] = [
     shortName: 'Medical',
     icon: '🔬',
     color: '#ec4899',
-    gradient: 'from-pink-500 to-pink-600',
+    gradient: 'from-pink-600 to-pink-700',
     description: 'Medical devices, scientific instruments, healthcare technology, and life sciences',
   },
 ];

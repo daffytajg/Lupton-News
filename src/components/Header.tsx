@@ -126,10 +126,13 @@ export default function Header({ onMenuToggle, isMobileMenuOpen }: HeaderProps) 
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-lupton-blue focus:border-transparent transition-all text-gray-900 dark:text-white"
                   />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-gray-400">
+                  <button
+                    type="submit"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-lupton-blue hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                  >
                     <Sparkles size={14} className="text-lupton-accent" />
-                    <span>AI Search</span>
-                  </div>
+                    <span>Search</span>
+                  </button>
                 </div>
               </form>
             </div>
