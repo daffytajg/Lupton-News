@@ -2,11 +2,22 @@
 // This imports companies from the data/companies.ts file into the database
 
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { MANUFACTURERS, CUSTOMERS } from '@/data/companies';
 
 export async function POST(request: Request) {
+  // Check if database is configured
+  if (!process.env.DATABASE_URL) {
+    return NextResponse.json(
+      { error: 'Database not configured. Sync requires a database connection.' },
+      { status: 503 }
+    );
+  }
+
   try {
+    // Dynamic import to avoid loading Prisma when not needed
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+
     const results = {
       created: 0,
       updated: 0,
@@ -58,6 +69,8 @@ export async function POST(request: Request) {
         results.errors.push(`${company.name}: ${err.message}`);
       }
     }
+
+    await prisma.$disconnect();
 
     return NextResponse.json({
       success: true,
