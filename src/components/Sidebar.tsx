@@ -19,6 +19,7 @@ import {
   ChevronRight,
   FileText,
   TrendingUp,
+  Factory,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SECTORS } from '@/data/sectors';
@@ -149,6 +150,20 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 label="M&A Activity"
                 isActive={pathname === '/categories/mergers-acquisitions'}
                 badge={MOCK_DASHBOARD_STATS.categoryBreakdown?.['mergers-acquisitions']}
+                onClick={onClose}
+              />
+            </div>
+
+            {/* Admin */}
+            <div className="mb-6">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">
+                Admin
+              </p>
+              <NavItem
+                href="/companies/manage"
+                icon={<Factory size={18} />}
+                label="Manage Companies"
+                isActive={pathname === '/companies/manage'}
                 onClick={onClose}
               />
             </div>

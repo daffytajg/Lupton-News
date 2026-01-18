@@ -258,7 +258,7 @@ export async function GET(request: Request) {
 
     try {
       const { data, error } = await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || 'Lupton News <digest@resend.dev>',
+        from: process.env.RESEND_FROM_EMAIL || 'Lupton News <digest@luptons.com>',
         to: recipient.email,
         subject: `📰 Lupton News Daily Digest - ${today}`,
         html: generateEmailHtml(recipient.name),

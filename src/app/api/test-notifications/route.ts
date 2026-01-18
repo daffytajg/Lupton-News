@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       const resend = new Resend(resendApiKey);
       
       const { data, error } = await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || 'Lupton News <digest@resend.dev>',
+        from: process.env.RESEND_FROM_EMAIL || 'Lupton News <alerts@luptons.com>',
         to: email,
         subject: '✅ Lupton News - Test Email Successful',
         html: `
