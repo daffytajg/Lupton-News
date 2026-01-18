@@ -5,18 +5,10 @@
 import { NextResponse } from 'next/server';
 import { MANUFACTURERS, CUSTOMERS } from '@/data/companies';
 
-// Helper to check if Prisma is available
-async function getPrismaClient() {
-  try {
-    const { prisma } = await import('@/lib/prisma');
-    // Test connection
-    await prisma.$queryRaw`SELECT 1`;
-    return prisma;
-  } catch (error) {
-    console.warn('Database not available, using static data');
-    return null;
-  }
-}
+// Check if database is configured
+const isDatabaseConfigured = () => {
+  return !!process.env.DATABASE_URL;
+};
 
 // GET - List all companies with optional filtering
 export async function GET(request: Request) {
@@ -26,100 +18,105 @@ export async function GET(request: Request) {
     const sector = searchParams.get('sector');
     const search = searchParams.get('search');
 
-    const prisma = await getPrismaClient();
+    // Check if database is available
+    if (isDatabaseConfigured()) {
+      try {
+        const { prisma } = await import('@/lib/prisma');
+        
+        const where: any = {};
 
-    if (prisma) {
-      // Use database
-      const where: any = {};
+        if (type) {
+          where.type = type.toUpperCase();
+        }
 
-      if (type) {
-        where.type = type.toUpperCase();
-      }
+        if (search) {
+          where.OR = [
+            { name: { contains: search } },
+            { shortName: { contains: search } },
+            { description: { contains: search } },
+          ];
+        }
 
-      if (search) {
-        where.OR = [
-          { name: { contains: search } },
-          { shortName: { contains: search } },
-          { description: { contains: search } },
-        ];
-      }
-
-      const companies = await prisma.company.findMany({
-        where,
-        orderBy: { name: 'asc' },
-        include: {
-          parentCompany: {
-            select: { id: true, name: true },
+        const companies = await prisma.company.findMany({
+          where,
+          orderBy: { name: 'asc' },
+          include: {
+            parentCompany: {
+              select: { id: true, name: true },
+            },
+            subsidiaries: {
+              select: { id: true, name: true },
+            },
           },
-          subsidiaries: {
-            select: { id: true, name: true },
-          },
-        },
-      });
-
-      // Parse JSON fields and filter by sector if needed
-      const formattedCompanies = companies
-        .map((company) => ({
-          ...company,
-          sectors: JSON.parse(company.sectors || '[]'),
-          searchIdentifiers: JSON.parse(company.searchIdentifiers || '[]'),
-          keyContacts: JSON.parse(company.keyContacts || '[]'),
-        }))
-        .filter((company) => {
-          if (sector) {
-            return company.sectors.includes(sector);
-          }
-          return true;
         });
 
-      return NextResponse.json({ companies: formattedCompanies });
-    } else {
-      // Fall back to static data
-      let allCompanies = [...MANUFACTURERS, ...CUSTOMERS].map((c) => ({
-        id: c.id,
-        externalId: c.id,
-        name: c.name,
-        shortName: c.name.split(' ')[0],
-        type: c.type.toUpperCase(),
-        website: c.website || null,
-        stockTicker: c.ticker || null,
-        stockExchange: null,
-        headquarters: c.headquarters || null,
-        description: c.description || null,
-        searchIdentifiers: c.searchIdentifiers || [],
-        sectors: c.sectors || [],
-        keyContacts: [],
-        parentCompanyId: null,
-        parentCompany: c.parentCompany ? { id: '', name: c.parentCompany } : null,
-        subsidiaries: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }));
+        // Parse JSON fields and filter by sector if needed
+        const formattedCompanies = companies
+          .map((company) => ({
+            ...company,
+            sectors: JSON.parse(company.sectors || '[]'),
+            searchIdentifiers: JSON.parse(company.searchIdentifiers || '[]'),
+            keyContacts: JSON.parse(company.keyContacts || '[]'),
+          }))
+          .filter((company) => {
+            if (sector) {
+              return company.sectors.includes(sector);
+            }
+            return true;
+          });
 
-      // Apply filters
-      if (type) {
-        allCompanies = allCompanies.filter((c) => c.type === type.toUpperCase());
+        return NextResponse.json({ companies: formattedCompanies });
+      } catch (dbError) {
+        console.warn('Database error, falling back to static data:', dbError);
+        // Fall through to static data
       }
-
-      if (sector) {
-        allCompanies = allCompanies.filter((c) => c.sectors.includes(sector));
-      }
-
-      if (search) {
-        const term = search.toLowerCase();
-        allCompanies = allCompanies.filter(
-          (c) =>
-            c.name.toLowerCase().includes(term) ||
-            c.shortName?.toLowerCase().includes(term) ||
-            c.description?.toLowerCase().includes(term)
-        );
-      }
-
-      // Sort by name
-      allCompanies.sort((a, b) => a.name.localeCompare(b.name));
-
-      return NextResponse.json({ companies: allCompanies, source: 'static' });
     }
+
+    // Fall back to static data
+    let allCompanies = [...MANUFACTURERS, ...CUSTOMERS].map((c) => ({
+      id: c.id,
+      externalId: c.id,
+      name: c.name,
+      shortName: c.name.split(' ')[0],
+      type: c.type.toUpperCase(),
+      website: c.website || null,
+      stockTicker: c.ticker || null,
+      stockExchange: null,
+      headquarters: c.headquarters || null,
+      description: c.description || null,
+      searchIdentifiers: c.searchIdentifiers || [],
+      sectors: c.sectors || [],
+      keyContacts: [],
+      parentCompanyId: null,
+      parentCompany: c.parentCompany ? { id: '', name: c.parentCompany } : null,
+      subsidiaries: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }));
+
+    // Apply filters
+    if (type) {
+      allCompanies = allCompanies.filter((c) => c.type === type.toUpperCase());
+    }
+
+    if (sector) {
+      allCompanies = allCompanies.filter((c) => c.sectors.includes(sector));
+    }
+
+    if (search) {
+      const term = search.toLowerCase();
+      allCompanies = allCompanies.filter(
+        (c) =>
+          c.name.toLowerCase().includes(term) ||
+          c.shortName?.toLowerCase().includes(term) ||
+          c.description?.toLowerCase().includes(term)
+      );
+    }
+
+    // Sort by name
+    allCompanies.sort((a, b) => a.name.localeCompare(b.name));
+
+    return NextResponse.json({ companies: allCompanies, source: 'static' });
   } catch (error: any) {
     console.error('Error fetching companies:', error);
     return NextResponse.json(
@@ -132,14 +129,14 @@ export async function GET(request: Request) {
 // POST - Create a new company
 export async function POST(request: Request) {
   try {
-    const prisma = await getPrismaClient();
-
-    if (!prisma) {
+    if (!isDatabaseConfigured()) {
       return NextResponse.json(
         { error: 'Database not configured. Company management requires a database connection.' },
         { status: 503 }
       );
     }
+
+    const { prisma } = await import('@/lib/prisma');
 
     const body = await request.json();
     const {
@@ -221,14 +218,14 @@ export async function POST(request: Request) {
 // PUT - Update an existing company
 export async function PUT(request: Request) {
   try {
-    const prisma = await getPrismaClient();
-
-    if (!prisma) {
+    if (!isDatabaseConfigured()) {
       return NextResponse.json(
         { error: 'Database not configured. Company management requires a database connection.' },
         { status: 503 }
       );
     }
+
+    const { prisma } = await import('@/lib/prisma');
 
     const body = await request.json();
     const {
@@ -298,14 +295,14 @@ export async function PUT(request: Request) {
 // DELETE - Remove a company
 export async function DELETE(request: Request) {
   try {
-    const prisma = await getPrismaClient();
-
-    if (!prisma) {
+    if (!isDatabaseConfigured()) {
       return NextResponse.json(
         { error: 'Database not configured. Company management requires a database connection.' },
         { status: 503 }
       );
     }
+
+    const { prisma } = await import('@/lib/prisma');
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
