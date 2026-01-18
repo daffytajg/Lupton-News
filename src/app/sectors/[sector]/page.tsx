@@ -63,16 +63,18 @@ export default function SectorPage() {
         <main className="flex-1 lg:ml-72 p-4 lg:p-6">
           {/* Sector Header */}
           <div className={cn(
-            'rounded-2xl p-6 mb-6 text-white bg-gradient-to-r',
+            'rounded-2xl p-6 mb-6 text-white bg-gradient-to-r relative overflow-hidden',
             sector.gradient
           )}>
-            <div className="flex items-start justify-between">
+            {/* Dark overlay for better text contrast */}
+            <div className="absolute inset-0 bg-black/20" />
+            <div className="flex items-start justify-between relative z-10">
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <span className="text-4xl">{sector.icon}</span>
-                  <h1 className="text-3xl font-bold text-white drop-shadow-lg">{sector.name}</h1>
+                  <h1 className="text-3xl font-bold text-white" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{sector.name}</h1>
                 </div>
-                <p className="text-white max-w-xl drop-shadow-md font-medium">
+                <p className="text-white max-w-xl font-medium" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}>
                   {sector.description}
                 </p>
                 <div className="flex items-center gap-4 mt-4">
