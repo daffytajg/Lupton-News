@@ -4,11 +4,7 @@
 
 import { NextResponse } from 'next/server';
 import { MANUFACTURERS, CUSTOMERS } from '@/data/companies';
-
-// Check if database is configured
-const isDatabaseConfigured = () => {
-  return !!process.env.DATABASE_URL;
-};
+import { prisma } from '@/lib/prisma';
 
 // GET - List all companies with optional filtering
 export async function GET(request: Request) {
@@ -18,11 +14,9 @@ export async function GET(request: Request) {
     const sector = searchParams.get('sector');
     const search = searchParams.get('search');
 
-    // Check if database is available
-    if (isDatabaseConfigured()) {
+    // Try database if available
+    if (prisma) {
       try {
-        const { prisma } = await import('@/lib/prisma');
-        
         const where: any = {};
 
         if (type) {
@@ -129,14 +123,12 @@ export async function GET(request: Request) {
 // POST - Create a new company
 export async function POST(request: Request) {
   try {
-    if (!isDatabaseConfigured()) {
+    if (!prisma) {
       return NextResponse.json(
         { error: 'Database not configured. Company management requires a database connection.' },
         { status: 503 }
       );
     }
-
-    const { prisma } = await import('@/lib/prisma');
 
     const body = await request.json();
     const {
@@ -218,14 +210,12 @@ export async function POST(request: Request) {
 // PUT - Update an existing company
 export async function PUT(request: Request) {
   try {
-    if (!isDatabaseConfigured()) {
+    if (!prisma) {
       return NextResponse.json(
         { error: 'Database not configured. Company management requires a database connection.' },
         { status: 503 }
       );
     }
-
-    const { prisma } = await import('@/lib/prisma');
 
     const body = await request.json();
     const {
@@ -295,14 +285,12 @@ export async function PUT(request: Request) {
 // DELETE - Remove a company
 export async function DELETE(request: Request) {
   try {
-    if (!isDatabaseConfigured()) {
+    if (!prisma) {
       return NextResponse.json(
         { error: 'Database not configured. Company management requires a database connection.' },
         { status: 503 }
       );
     }
-
-    const { prisma } = await import('@/lib/prisma');
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
