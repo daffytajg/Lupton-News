@@ -107,6 +107,8 @@ export default function ManageCompaniesPage() {
     setFilteredCompanies(filtered);
   }, [companies, searchTerm, typeFilter, sectorFilter]);
 
+  const [isReadOnly, setIsReadOnly] = useState(false);
+
   const fetchCompanies = async () => {
     try {
       setLoading(true);
@@ -114,6 +116,10 @@ export default function ManageCompaniesPage() {
       const data = await response.json();
       if (data.companies) {
         setCompanies(data.companies);
+        // Check if using static data (read-only mode)
+        if (data.source === 'static') {
+          setIsReadOnly(true);
+        }
       }
     } catch (err) {
       setError('Failed to load companies');
@@ -260,6 +266,7 @@ export default function ManageCompaniesPage() {
                 Add, edit, and manage manufacturers, principals, OEMs, and customers
               </p>
             </div>
+            {!isReadOnly && (
             <button
               onClick={() => openModal()}
               className="flex items-center gap-2 px-4 py-2 bg-lupton-blue text-white rounded-lg hover:bg-lupton-navy transition-colors"
@@ -267,7 +274,18 @@ export default function ManageCompaniesPage() {
               <Plus size={18} />
               Add Company
             </button>
+            )}
           </div>
+
+          {/* Read-only notice */}
+          {isReadOnly && (
+            <div className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg flex items-center gap-2 text-amber-700 dark:text-amber-400">
+              <AlertCircle size={18} />
+              <span>
+                <strong>Read-only mode:</strong> Viewing companies from static data. To enable add/edit/delete, configure a database connection in Vercel.
+              </span>
+            </div>
+          )}
 
           {/* Success/Error Messages */}
           {success && (
@@ -409,38 +427,42 @@ export default function ManageCompaniesPage() {
                         </td>
                         <td className="px-4 py-4 text-right">
                           <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => openModal(company)}
-                              className="p-2 text-gray-500 hover:text-lupton-blue hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                              title="Edit"
-                            >
-                              <Edit2 size={16} />
-                            </button>
-                            {deleteConfirm === company.id ? (
-                              <div className="flex items-center gap-1">
+                            {!isReadOnly && (
+                              <>
                                 <button
-                                  onClick={() => handleDelete(company.id)}
-                                  className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
-                                  title="Confirm Delete"
+                                  onClick={() => openModal(company)}
+                                  className="p-2 text-gray-500 hover:text-lupton-blue hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                  title="Edit"
                                 >
-                                  <Check size={16} />
+                                  <Edit2 size={16} />
                                 </button>
-                                <button
-                                  onClick={() => setDeleteConfirm(null)}
-                                  className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                                  title="Cancel"
-                                >
-                                  <X size={16} />
-                                </button>
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => setDeleteConfirm(company.id)}
-                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                                title="Delete"
-                              >
-                                <Trash2 size={16} />
-                              </button>
+                                {deleteConfirm === company.id ? (
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      onClick={() => handleDelete(company.id)}
+                                      className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                                      title="Confirm Delete"
+                                    >
+                                      <Check size={16} />
+                                    </button>
+                                    <button
+                                      onClick={() => setDeleteConfirm(null)}
+                                      className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                      title="Cancel"
+                                    >
+                                      <X size={16} />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => setDeleteConfirm(company.id)}
+                                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                    title="Delete"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                )}
+                              </>
                             )}
                           </div>
                         </td>
