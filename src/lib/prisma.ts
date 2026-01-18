@@ -35,3 +35,4 @@ if (!globalForPrisma.prismaInitialized) {
 export const prisma = globalForPrisma.prisma ?? null;
 
 export default prisma;
+// Trigger rebuild with database env vars
