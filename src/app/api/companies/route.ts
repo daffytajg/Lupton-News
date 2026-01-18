@@ -4,19 +4,48 @@
 
 import { NextResponse } from 'next/server';
 import { MANUFACTURERS, CUSTOMERS } from '@/data/companies';
-import { prisma } from '@/lib/prisma';
+
+// Helper to get static companies data
+function getStaticCompanies() {
+  return [...MANUFACTURERS, ...CUSTOMERS].map((c) => ({
+    id: c.id,
+    externalId: c.id,
+    name: c.name,
+    shortName: c.name.split(' ')[0],
+    type: c.type.toUpperCase(),
+    website: c.website || null,
+    stockTicker: c.ticker || null,
+    stockExchange: null,
+    headquarters: c.headquarters || null,
+    description: c.description || null,
+    searchIdentifiers: c.searchIdentifiers || [],
+    sectors: c.sectors || [],
+    keyContacts: [],
+    parentCompanyId: null,
+    parentCompany: c.parentCompany ? { id: '', name: c.parentCompany } : null,
+    subsidiaries: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }));
+}
 
 // GET - List all companies with optional filtering
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type'); // manufacturer, principal, oem, customer
+    const type = searchParams.get('type');
     const sector = searchParams.get('sector');
     const search = searchParams.get('search');
 
-    // Try database if available
-    if (prisma) {
+    // Check if database is configured
+    const dbUrl = process.env.DATABASE_URL;
+    
+    if (dbUrl) {
       try {
+        // Dynamic import to avoid loading Prisma when not needed
+        const { PrismaClient } = await import('@prisma/client');
+        const prisma = new PrismaClient();
+        
         const where: any = {};
 
         if (type) {
@@ -44,6 +73,8 @@ export async function GET(request: Request) {
           },
         });
 
+        await prisma.$disconnect();
+
         // Parse JSON fields and filter by sector if needed
         const formattedCompanies = companies
           .map((company) => ({
@@ -60,33 +91,14 @@ export async function GET(request: Request) {
           });
 
         return NextResponse.json({ companies: formattedCompanies });
-      } catch (dbError) {
-        console.warn('Database error, falling back to static data:', dbError);
+      } catch (dbError: any) {
+        console.warn('Database error, falling back to static data:', dbError.message);
         // Fall through to static data
       }
     }
 
     // Fall back to static data
-    let allCompanies = [...MANUFACTURERS, ...CUSTOMERS].map((c) => ({
-      id: c.id,
-      externalId: c.id,
-      name: c.name,
-      shortName: c.name.split(' ')[0],
-      type: c.type.toUpperCase(),
-      website: c.website || null,
-      stockTicker: c.ticker || null,
-      stockExchange: null,
-      headquarters: c.headquarters || null,
-      description: c.description || null,
-      searchIdentifiers: c.searchIdentifiers || [],
-      sectors: c.sectors || [],
-      keyContacts: [],
-      parentCompanyId: null,
-      parentCompany: c.parentCompany ? { id: '', name: c.parentCompany } : null,
-      subsidiaries: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }));
+    let allCompanies = getStaticCompanies();
 
     // Apply filters
     if (type) {
@@ -122,13 +134,18 @@ export async function GET(request: Request) {
 
 // POST - Create a new company
 export async function POST(request: Request) {
+  const dbUrl = process.env.DATABASE_URL;
+  
+  if (!dbUrl) {
+    return NextResponse.json(
+      { error: 'Database not configured. Company management requires a database connection.' },
+      { status: 503 }
+    );
+  }
+
   try {
-    if (!prisma) {
-      return NextResponse.json(
-        { error: 'Database not configured. Company management requires a database connection.' },
-        { status: 503 }
-      );
-    }
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
 
     const body = await request.json();
     const {
@@ -147,6 +164,7 @@ export async function POST(request: Request) {
     } = body;
 
     if (!name) {
+      await prisma.$disconnect();
       return NextResponse.json(
         { error: 'Company name is required' },
         { status: 400 }
@@ -165,6 +183,7 @@ export async function POST(request: Request) {
     });
 
     if (existing) {
+      await prisma.$disconnect();
       return NextResponse.json(
         { error: 'A company with this name already exists' },
         { status: 409 }
@@ -189,6 +208,8 @@ export async function POST(request: Request) {
       },
     });
 
+    await prisma.$disconnect();
+
     return NextResponse.json({
       success: true,
       company: {
@@ -209,13 +230,18 @@ export async function POST(request: Request) {
 
 // PUT - Update an existing company
 export async function PUT(request: Request) {
+  const dbUrl = process.env.DATABASE_URL;
+  
+  if (!dbUrl) {
+    return NextResponse.json(
+      { error: 'Database not configured. Company management requires a database connection.' },
+      { status: 503 }
+    );
+  }
+
   try {
-    if (!prisma) {
-      return NextResponse.json(
-        { error: 'Database not configured. Company management requires a database connection.' },
-        { status: 503 }
-      );
-    }
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
 
     const body = await request.json();
     const {
@@ -235,6 +261,7 @@ export async function PUT(request: Request) {
     } = body;
 
     if (!id) {
+      await prisma.$disconnect();
       return NextResponse.json(
         { error: 'Company ID is required' },
         { status: 400 }
@@ -264,6 +291,8 @@ export async function PUT(request: Request) {
       data: updateData,
     });
 
+    await prisma.$disconnect();
+
     return NextResponse.json({
       success: true,
       company: {
@@ -284,18 +313,24 @@ export async function PUT(request: Request) {
 
 // DELETE - Remove a company
 export async function DELETE(request: Request) {
+  const dbUrl = process.env.DATABASE_URL;
+  
+  if (!dbUrl) {
+    return NextResponse.json(
+      { error: 'Database not configured. Company management requires a database connection.' },
+      { status: 503 }
+    );
+  }
+
   try {
-    if (!prisma) {
-      return NextResponse.json(
-        { error: 'Database not configured. Company management requires a database connection.' },
-        { status: 503 }
-      );
-    }
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
     if (!id) {
+      await prisma.$disconnect();
       return NextResponse.json(
         { error: 'Company ID is required' },
         { status: 400 }
@@ -305,6 +340,8 @@ export async function DELETE(request: Request) {
     await prisma.company.delete({
       where: { id },
     });
+
+    await prisma.$disconnect();
 
     return NextResponse.json({ success: true, message: 'Company deleted' });
   } catch (error: any) {
