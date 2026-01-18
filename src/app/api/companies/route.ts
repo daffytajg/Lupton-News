@@ -4,6 +4,7 @@
 
 import { NextResponse } from 'next/server';
 import { MANUFACTURERS, CUSTOMERS } from '@/data/companies';
+import type { Sector } from '@/types';
 
 // Helper to get static companies data
 function getStaticCompanies() {
@@ -106,7 +107,7 @@ export async function GET(request: Request) {
     }
 
     if (sector) {
-      allCompanies = allCompanies.filter((c) => c.sectors.includes(sector));
+      allCompanies = allCompanies.filter((c) => c.sectors.includes(sector as Sector));
     }
 
     if (search) {
