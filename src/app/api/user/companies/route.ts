@@ -53,7 +53,6 @@ export async function GET(request: Request) {
       searchIdentifiers: JSON.parse(uc.company.searchIdentifiers || '[]'),
       keyContacts: JSON.parse(uc.company.keyContacts || '[]'),
       assignmentId: uc.id,
-      role: uc.role,
       isPrimary: uc.isPrimary,
     }));
 
@@ -123,7 +122,7 @@ export async function POST(request: Request) {
       searchIdentifiers = [],
       sectors = [],
       keyContacts = [],
-      role = 'VIEWER',
+
       isPrimary = false,
     } = body;
 
@@ -220,7 +219,7 @@ export async function POST(request: Request) {
       data: {
         userId: session.user.id,
         companyId: company.id,
-        role,
+
         isPrimary,
       },
       include: {
@@ -236,7 +235,7 @@ export async function POST(request: Request) {
         searchIdentifiers: JSON.parse(assignment.company.searchIdentifiers || '[]'),
         keyContacts: JSON.parse(assignment.company.keyContacts || '[]'),
         assignmentId: assignment.id,
-        role: assignment.role,
+
         isPrimary: assignment.isPrimary,
       },
     });
