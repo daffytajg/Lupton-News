@@ -392,9 +392,7 @@ export default function EmailDigestPage() {
                     </div>
                   </div>
                 </div>
-                <button className="w-full mt-3 px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
-                  + Add Recipient
-                </button>
+
               </div>
 
               {/* Actions */}
