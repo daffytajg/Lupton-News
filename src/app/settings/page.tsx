@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import { cn } from '@/lib/utils';
@@ -103,6 +104,7 @@ export default function SettingsPage() {
 }
 
 function NotificationSettings() {
+  const { data: session } = useSession();
   const [settings, setSettings] = useState({
     emailEnabled: true,
     pushEnabled: true,
@@ -256,16 +258,18 @@ function NotificationSettings() {
         <div className="flex flex-wrap gap-3">
           <button
             onClick={async () => {
-              const profile = getStoredValue('userProfile', { email: '', fullName: '' });
-              if (!profile.email) {
-                alert('Please set your email in the Profile section first.');
+              // Use session email first, then fall back to localStorage
+              const userEmail = session?.user?.email || getStoredValue('userProfile', { email: '' }).email;
+              const userName = session?.user?.name || getStoredValue('userProfile', { fullName: '' }).fullName;
+              if (!userEmail) {
+                alert('Please log in or set your email in the Profile section first.');
                 return;
               }
               try {
                 const res = await fetch('/api/test-notifications', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ type: 'email', email: profile.email, name: profile.fullName }),
+                  body: JSON.stringify({ type: 'email', email: userEmail, name: userName }),
                 });
                 const data = await res.json();
                 if (data.success) {
@@ -591,6 +595,7 @@ function EmailDigestSettings() {
 }
 
 function ProfileSettings() {
+  const { data: session } = useSession();
   const [profile, setProfile] = useState({
     fullName: '',
     email: '',
@@ -601,18 +606,24 @@ function ProfileSettings() {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load profile from localStorage on mount
+  // Load profile from session and localStorage on mount
   useEffect(() => {
     const stored = getStoredValue('userProfile', {
-      fullName: 'Alan Lupton II',
-      email: 'alan@luptons.com',
-      role: 'Admin',
+      fullName: session?.user?.name || '',
+      email: session?.user?.email || '',
+      role: 'Sales',
       phone: '',
-      title: 'President',
+      title: '',
     });
+    // Override with session data if available
+    if (session?.user) {
+      stored.fullName = session.user.name || stored.fullName;
+      stored.email = session.user.email || stored.email;
+    }
     setProfile(stored);
+    setStoredValue('userProfile', stored); // Sync localStorage with session
     setIsLoaded(true);
-  }, []);
+  }, [session]);
 
   const handleSave = () => {
     setSaveStatus('saving');
