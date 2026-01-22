@@ -1,16 +1,9 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
-    if (!prisma) {
-      return NextResponse.json(
-        { error: 'Database not configured' },
-        { status: 500 }
-      );
-    }
-
     const { name, email, password } = await request.json();
 
     if (!name || !email || !password) {
