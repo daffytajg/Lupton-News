@@ -1,8 +1,9 @@
 // Cron endpoint for sending daily email digests
 // This should be triggered by Vercel Cron or an external scheduler
+// Uses Gmail SMTP with App Password
 
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { sendEmail } from '@/lib/gmail';
 import { MOCK_NEWS, MOCK_STOCK_DATA } from '@/data/mockNews';
 import { HISTORICAL_ARTICLES } from '@/data/historicalArticles';
 import { SECTORS } from '@/data/sectors';
@@ -25,12 +26,11 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const resendApiKey = process.env.RESEND_API_KEY;
-  if (!resendApiKey) {
-    return NextResponse.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
+  // Check if Gmail is configured
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    return NextResponse.json({ error: 'Gmail not configured. Set GMAIL_USER and GMAIL_APP_PASSWORD.' }, { status: 500 });
   }
 
-  const resend = new Resend(resendApiKey);
   const results: { email: string; success: boolean; error?: string }[] = [];
 
   // Combine all articles
@@ -257,15 +257,14 @@ export async function GET(request: Request) {
     if (!recipient.enabled || !recipient.email) continue;
 
     try {
-      const { data, error } = await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || 'Lupton News <digest@luptons.com>',
+      const result = await sendEmail({
         to: recipient.email,
         subject: `📰 Lupton News Daily Digest - ${today}`,
         html: generateEmailHtml(recipient.name),
       });
 
-      if (error) {
-        results.push({ email: recipient.email, success: false, error: error.message });
+      if (!result.success) {
+        results.push({ email: recipient.email, success: false, error: result.error });
       } else {
         results.push({ email: recipient.email, success: true });
       }
