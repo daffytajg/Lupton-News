@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import NewsCard from '@/components/NewsCard';
@@ -25,8 +26,17 @@ import {
 } from 'lucide-react';
 
 export default function EmailDigestPage() {
+  const { data: session } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [digestContent, setDigestContent] = useState({
+    topStories: true,
+    companyUpdates: true,
+    aiInsights: true,
+    stockMovers: true,
+    sectorHighlights: false,
+    upcomingEvents: false,
+  });
   const [expandedSections, setExpandedSections] = useState({
     topStories: true,
     companies: true,
@@ -339,27 +349,30 @@ export default function EmailDigestPage() {
                 </h3>
                 <div className="space-y-2">
                   {[
-                    { label: 'Top Stories', enabled: true },
-                    { label: 'Company Updates', enabled: true },
-                    { label: 'AI Insights', enabled: true },
-                    { label: 'Stock Movers', enabled: true },
-                    { label: 'Sector Highlights', enabled: false },
-                    { label: 'Upcoming Events', enabled: false },
+                    { key: 'topStories', label: 'Top Stories' },
+                    { key: 'companyUpdates', label: 'Company Updates' },
+                    { key: 'aiInsights', label: 'AI Insights' },
+                    { key: 'stockMovers', label: 'Stock Movers' },
+                    { key: 'sectorHighlights', label: 'Sector Highlights' },
+                    { key: 'upcomingEvents', label: 'Upcoming Events' },
                   ].map((item) => (
                     <div
-                      key={item.label}
+                      key={item.key}
                       className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50"
                     >
                       <span className="text-sm text-gray-700">{item.label}</span>
-                      <div className={cn(
-                        'w-10 h-5 rounded-full transition-colors cursor-pointer',
-                        item.enabled ? 'bg-lupton-blue' : 'bg-gray-300'
-                      )}>
+                      <button
+                        onClick={() => setDigestContent(prev => ({ ...prev, [item.key]: !prev[item.key as keyof typeof prev] }))}
+                        className={cn(
+                          'w-10 h-5 rounded-full transition-colors cursor-pointer relative',
+                          digestContent[item.key as keyof typeof digestContent] ? 'bg-lupton-blue' : 'bg-gray-300'
+                        )}
+                      >
                         <div className={cn(
-                          'w-4 h-4 rounded-full bg-white shadow-sm transform transition-transform mt-0.5',
-                          item.enabled ? 'translate-x-5' : 'translate-x-0.5'
+                          'w-4 h-4 rounded-full bg-white shadow-sm transform transition-transform absolute top-0.5',
+                          digestContent[item.key as keyof typeof digestContent] ? 'left-5' : 'left-0.5'
                         )} />
-                      </div>
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -371,11 +384,11 @@ export default function EmailDigestPage() {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
                     <div className="w-8 h-8 rounded-full bg-lupton-blue flex items-center justify-center text-white text-sm font-medium">
-                      AL
+                      {session?.user?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">Alan Lupton II</p>
-                      <p className="text-xs text-gray-500">alan@luptons.com</p>
+                      <p className="text-sm font-medium text-gray-900">{session?.user?.name || 'Guest'}</p>
+                      <p className="text-xs text-gray-500">{session?.user?.email || 'Not signed in'}</p>
                     </div>
                   </div>
                 </div>
