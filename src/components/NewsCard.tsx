@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -32,6 +33,8 @@ export default function NewsCard({
   const relevantCategories = NEWS_CATEGORIES.filter(c => article.categories.includes(c.id));
   const companies = article.companies.map(id => getCompanyById(id)).filter(Boolean);
   const sourceInfo = getSourceByName(article.source);
+  const [imageError, setImageError] = useState(false);
+  const hasValidImage = article.imageUrl && !article.imageUrl.startsWith('/images/') && !imageError;
 
   if (variant === 'featured') {
     return (
@@ -69,18 +72,16 @@ export default function NewsCard({
     <article className="news-card bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-md">
       {/* Image */}
       <div className="relative h-40 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900">
-        {article.imageUrl && !article.imageUrl.startsWith('/images/') ? (
+        {hasValidImage ? (
           <Image
-            src={article.imageUrl}
+            src={article.imageUrl!}
             alt={article.title}
             fill
             className="object-cover"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
+            onError={() => setImageError(true)}
           />
         ) : null}
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <div className={`absolute inset-0 flex flex-col items-center justify-center ${hasValidImage ? 'opacity-0' : 'opacity-100'}`}>
           <div className="text-5xl mb-2">
             {relevantSectors[0]?.icon || relevantCategories[0]?.icon || '📰'}
           </div>
@@ -243,27 +244,29 @@ function FeaturedNewsCard({
   companies: any[];
 }) {
   const sourceInfo = getSourceByName(article.source);
+  const [imageError, setImageError] = useState(false);
+  const hasValidImage = article.imageUrl && !article.imageUrl.startsWith('/images/') && !imageError;
 
   return (
     <article className="news-card bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-lg">
       <div className="grid md:grid-cols-2 gap-0">
         {/* Image */}
         <div className="relative h-64 md:h-full min-h-[280px] bg-gradient-to-br from-lupton-navy to-lupton-blue">
-          {article.imageUrl && !article.imageUrl.startsWith('/images/') ? (
+          {hasValidImage ? (
             <Image
-              src={article.imageUrl}
+              src={article.imageUrl!}
               alt={article.title}
               fill
               className="object-cover"
+              onError={() => setImageError(true)}
             />
-          ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-lupton-navy via-lupton-blue to-indigo-600">
-              <div className="text-8xl mb-4 opacity-80">{categories[0]?.icon || sectors[0]?.icon || '📰'}</div>
-              <div className="text-white/60 text-sm font-medium uppercase tracking-wider">
-                {sectors[0]?.name || 'Industry News'}
-              </div>
+          ) : null}
+          <div className={`absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-lupton-navy via-lupton-blue to-indigo-600 ${hasValidImage ? 'opacity-0' : 'opacity-100'}`}>
+            <div className="text-8xl mb-4 opacity-80">{categories[0]?.icon || sectors[0]?.icon || '📰'}</div>
+            <div className="text-white/60 text-sm font-medium uppercase tracking-wider">
+              {sectors[0]?.name || 'Industry News'}
             </div>
-          )}
+          </div>
           {article.isBreaking && (
             <div className="absolute top-4 left-4 px-3 py-1.5 bg-red-600 text-white text-sm font-bold rounded animate-pulse">
               BREAKING NEWS
@@ -474,19 +477,22 @@ function ListNewsCard({
   companies: any[];
 }) {
   const sourceInfo = getSourceByName(article.source);
+  const [imageError, setImageError] = useState(false);
+  const hasValidImage = article.imageUrl && !article.imageUrl.startsWith('/images/') && !imageError;
 
   return (
     <article className="news-card bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 p-4 hover:shadow-md">
       <div className="flex gap-4">
         {/* Thumbnail */}
         <div className="hidden sm:block w-32 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-          {article.imageUrl ? (
+          {hasValidImage ? (
             <Image
-              src={article.imageUrl}
+              src={article.imageUrl!}
               alt={article.title}
               width={128}
               height={96}
               className="object-cover w-full h-full"
+              onError={() => setImageError(true)}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
