@@ -20,6 +20,7 @@ import {
   FileText,
   TrendingUp,
   Factory,
+  User,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SECTORS } from '@/data/sectors';
@@ -150,6 +151,20 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 label="M&A Activity"
                 isActive={pathname === '/categories/mergers-acquisitions'}
                 badge={MOCK_DASHBOARD_STATS.categoryBreakdown?.['mergers-acquisitions']}
+                onClick={onClose}
+              />
+            </div>
+
+            {/* My Account */}
+            <div className="mb-6">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">
+                My Account
+              </p>
+              <NavItem
+                href="/my-companies"
+                icon={<User size={18} />}
+                label="My Companies"
+                isActive={pathname === '/my-companies'}
                 onClick={onClose}
               />
             </div>

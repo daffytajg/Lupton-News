@@ -137,9 +137,9 @@ function LoginForm() {
 
         <div className="mt-6 pt-6 border-t border-white/10 text-center">
           <p className="text-blue-200/60 text-sm">
-            Need access?{' '}
-            <a href="mailto:admin@luptons.com" className="text-blue-400 hover:text-blue-300 transition-colors">
-              Contact your administrator
+            Don't have an account?{' '}
+            <a href="/signup" className="text-blue-400 hover:text-blue-300 transition-colors">
+              Sign up
             </a>
           </p>
         </div>

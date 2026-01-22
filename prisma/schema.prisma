@@ -112,6 +112,7 @@ model Company {
   name              String
   shortName         String?
   type              String   @default("CUSTOMER")
+  logo              String?
   website           String?
   stockTicker       String?
   stockExchange     String?
