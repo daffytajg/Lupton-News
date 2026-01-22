@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -33,6 +34,7 @@ interface HeaderProps {
 }
 
 export default function Header({ onMenuToggle, isMobileMenuOpen }: HeaderProps) {
+  const { data: session } = useSession();
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -306,11 +308,14 @@ export default function Header({ onMenuToggle, isMobileMenuOpen }: HeaderProps) 
               <User size={20} className="text-white" />
             </div>
             <div>
-              <p className="font-medium text-gray-900 dark:text-white text-sm">Alan Lupton II</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">alan@luptons.com</p>
+              <p className="font-medium text-gray-900 dark:text-white text-sm">{session?.user?.name || 'Guest'}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{session?.user?.email || 'Not signed in'}</p>
             </div>
           </div>
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-sm font-medium transition-colors">
+          <button 
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-sm font-medium transition-colors"
+          >
             <LogOut size={18} />
             Sign Out
           </button>
@@ -428,13 +433,14 @@ function NotificationDropdown({
 }
 
 function UserDropdown({ onClose }: { onClose: () => void }) {
+  const { data: session } = useSession();
   return (
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
       <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
         <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-          <p className="font-medium text-gray-900 dark:text-white">Alan Lupton II</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">alan@luptons.com</p>
+          <p className="font-medium text-gray-900 dark:text-white">{session?.user?.name || 'Guest'}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{session?.user?.email || 'Not signed in'}</p>
         </div>
         <div className="p-2">
           <Link
@@ -460,7 +466,10 @@ function UserDropdown({ onClose }: { onClose: () => void }) {
           </Link>
         </div>
         <div className="p-2 border-t border-gray-100 dark:border-gray-700">
-          <button className="w-full px-3 py-2 text-sm text-left text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg">
+          <button 
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            className="w-full px-3 py-2 text-sm text-left text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+          >
             Sign Out
           </button>
         </div>

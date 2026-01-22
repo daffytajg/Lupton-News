@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useSession } from 'next-auth/react';
 import Header from '@/components/Header';
 import { SectorSidebar } from '@/components/SectorSidebar';
 import NewsCard from '@/components/NewsCard';
@@ -42,6 +43,7 @@ interface ArticleGroup {
 }
 
 export default function Dashboard() {
+  const { data: session } = useSession();
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [sortBy, setSortBy] = useState<SortBy>('latest');
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -196,7 +198,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {getGreeting()}, Alan
+                {getGreeting()}, {session?.user?.name?.split(' ')[0] || 'there'}
               </h1>
               <p className="text-gray-500 dark:text-gray-400 mt-1">
                 Here&apos;s what&apos;s happening with your OEMs and customers today.
