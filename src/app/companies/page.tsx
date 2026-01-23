@@ -116,7 +116,7 @@ export default function CompaniesPage() {
                   Companies
                 </h1>
                 <p className="text-gray-500 mt-1">
-                  {COMPANIES.filter((c) => c.isActive).length} active OEMs, customers, and principals
+                  {COMPANIES.filter((c) => c.isActive).length} active customers and manufacturers
                 </p>
               </div>
             </div>
@@ -169,17 +169,6 @@ export default function CompaniesPage() {
                 <div className="h-4 w-px bg-gray-300" />
                 <span className="text-xs text-gray-400">Lupton Represents:</span>
                 <button
-                  onClick={() => setTypeFilter('principal')}
-                  className={cn(
-                    'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
-                    typeFilter === 'principal'
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-purple-50 text-purple-700 hover:bg-purple-100'
-                  )}
-                >
-                  🏭 Principals
-                </button>
-                <button
                   onClick={() => setTypeFilter('manufacturer')}
                   className={cn(
                     'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
@@ -189,17 +178,6 @@ export default function CompaniesPage() {
                   )}
                 >
                   ⚙️ Manufacturers
-                </button>
-                <button
-                  onClick={() => setTypeFilter('oem')}
-                  className={cn(
-                    'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
-                    typeFilter === 'oem'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
-                  )}
-                >
-                  🔧 OEMs
                 </button>
               </div>
 
